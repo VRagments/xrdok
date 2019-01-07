@@ -9,6 +9,7 @@ abstraction.
 
 ### Basic Example (See [source](https://glitch.com/edit/#!/vine-flax?path=index.html) or [view live](https://vine-flax.glitch.me/) on Glitch)
 
+```
 <!DOCTYPE html>
 <html>
   <head>
@@ -39,6 +40,7 @@ abstraction.
     </a-scene>
   </body>
 </html>
+```
 
 ### XRDok components
 
