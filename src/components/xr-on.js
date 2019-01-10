@@ -72,7 +72,13 @@ Examples:
         this.el.removeEventListener(eName, this.next);
       }
       const el = this.el;
-      iterNamedNodeMapArr(this.current, function(idx, name, _val) { el.removeAttribute(name + '__' + idx); });
+      iterNamedNodeMapArr(this.current, function(idx, name, _val) {
+        if (idx === 0) {
+          el.removeAttribute(name);
+        } else {
+          el.removeAttribute(name + '__' + idx);
+        }
+      });
       this.current = null;
     }
     if (this.pendingComps.length > 0) {
@@ -87,9 +93,9 @@ Examples:
       const el = this.el;
       iterNamedNodeMapArr(nextArr, function(idx, name, value) {
         if (idx === 0) {
-          el.setAttribute(name, value);
+          el.setAttribute(name, value, true);
         } else {
-          el.setAttribute(name + '__' + idx, value);
+          el.setAttribute(name + '__' + idx, value, true);
         }
       });
       this.current = nextArr;
