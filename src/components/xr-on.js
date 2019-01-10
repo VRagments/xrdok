@@ -11,8 +11,8 @@ All children in front of and including the `xr-wait` component are triggered sim
 The remainder is triggered once the `xr-wait` condition has triggered.
 
 This component can be used multiple times to target different components/events.
-Beware the aframe syntax which is `xr-on__<id>` on multiple instances.
-To associate `xr-comp` children with their respective `xr-on__<id>` parents, simply use `xr-comp__<id>`.
+Beware the aframe syntax which is `xr-on__<name>` on multiple instances.
+To associate `xr-comp` children with their respective `xr-on__<name>` parents, simply use `xr-comp__<name>`.
 
 Events:
 
