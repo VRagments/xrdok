@@ -10,6 +10,9 @@ To have more control a `xr-wait` component can be added that will separate the c
 All children in front of and including the `xr-wait` component are triggered simultaneously.
 The remainder is triggered once the `xr-wait` condition has triggered.
 
+This component can be used multiple times to target different components/events.
+Beware the aframe syntax which is `xr-on__<id>` on multiple instances.
+To associate `xr-comp` children with their respective `xr-on__<id>` parents, simply use `xr-comp__<id>`.
 
 Events:
 
@@ -126,13 +129,14 @@ Examples:
     this.el.emit('xr-on');
   }
 
-  function parseComps(el) {
+  function parseComps({ id, el}) {
     const parsed = [];
     let cur = [];
     for (var i = 0; i < el.children.length; i++) {
       const c = el.children[i];
       const nodeName = c.nodeName;
-      if (nodeName.toLowerCase() === nodeComp) {
+      const nodeXRcomp = id ? `${nodeComp}__${id}` : nodeComp;
+      if (nodeName.toLowerCase() === nodeXRcomp) {
         cur.push(c.attributes);
         const aWait = c.attributes.getNamedItem(attrWait);
         if (aWait) {
@@ -155,7 +159,7 @@ Examples:
     init: function() {
       this.on = on.bind(this);
       this.next = next.bind(this);
-      this.xrcomps = parseComps(this.el);
+      this.xrcomps = parseComps(this);
       this.el.addEventListener(this.data.event, this.on);
     },
 
