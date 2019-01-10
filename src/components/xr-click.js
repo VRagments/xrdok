@@ -78,7 +78,6 @@ Examples:
     }
   }
 
-
   AFRAME.registerComponent('xr-click', {
     schema: {},
     init: function() {

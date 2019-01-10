@@ -10,10 +10,18 @@ To have more control a `xr-wait` component can be added that will separate the c
 All children in front of and including the `xr-wait` component are triggered simultaneously.
 The remainder is triggered once the `xr-wait` condition has triggered.
 
+This component can be used multiple times to target different components/events.
+Beware the aframe syntax which is `xr-on__<id>` on multiple instances.
+To associate `xr-comp` children with their respective `xr-on__<id>` parents, simply use `xr-comp__<id>`.
 
 Events:
 
 - xr-on, when the initial event has triggered and the component chain starts.
+
+Properties:
+
+- event: Needs to be specified in order to work. This is the initial trigger condition.
+- id: if we want to affect a different entity than ourself, specify the id of that component
 
 Examples:
 
@@ -64,6 +72,15 @@ Examples:
     }
   }
 
+  function targetElement({ data, el }) {
+    if (data.id) {
+      const t = document.querySelector(`#${data.id}`);
+      if (t) {
+        return t;
+      }
+    }
+    return el;
+  }
 
   function next() {
     if (this.current) {
@@ -72,7 +89,13 @@ Examples:
         this.el.removeEventListener(eName, this.next);
       }
       const el = this.el;
-      iterNamedNodeMapArr(this.current, function(idx, name, _val) { el.removeAttribute(name + '__' + idx); });
+      iterNamedNodeMapArr(this.current, function(idx, name, _val) {
+        if (idx === 0) {
+          el.removeAttribute(name);
+        } else {
+          el.removeAttribute(name + '__' + idx);
+        }
+      });
       this.current = null;
     }
     if (this.pendingComps.length > 0) {
@@ -84,12 +107,12 @@ Examples:
       // no more waiting means we are at the last batch and need to enable initial trigger condition
         this.el.addEventListener(this.data.event, this.on);
       }
-      const el = this.el;
+      const target = targetElement(this);
       iterNamedNodeMapArr(nextArr, function(idx, name, value) {
         if (idx === 0) {
-          el.setAttribute(name, value);
+          target.setAttribute(name, value, true);
         } else {
-          el.setAttribute(name + '__' + idx, value);
+          target.setAttribute(name + '__' + idx, value, true);
         }
       });
       this.current = nextArr;
@@ -100,19 +123,20 @@ Examples:
   }
 
   function on(_evt) {
+    this.el.removeEventListener(this.data.event, this.on);
     this.pendingComps = this.xrcomps.slice();
     this.next();
-    this.el.removeEventListener(this.data.event, this.on);
     this.el.emit('xr-on');
   }
 
-  function parseComps(el) {
+  function parseComps({ id, el}) {
     const parsed = [];
     let cur = [];
     for (var i = 0; i < el.children.length; i++) {
       const c = el.children[i];
       const nodeName = c.nodeName;
-      if (nodeName.toLowerCase() === nodeComp) {
+      const nodeXRcomp = id ? `${nodeComp}__${id}` : nodeComp;
+      if (nodeName.toLowerCase() === nodeXRcomp) {
         cur.push(c.attributes);
         const aWait = c.attributes.getNamedItem(attrWait);
         if (aWait) {
@@ -129,14 +153,18 @@ Examples:
 
   AFRAME.registerComponent('xr-on', {
     schema: {
-      event: { type: 'string', default: '' }
+      event: { type: 'string', default: '' },
+      id: { type: 'string', default: '' }
     },
     init: function() {
       this.on = on.bind(this);
       this.next = next.bind(this);
-      this.xrcomps = parseComps(this.el);
+      this.xrcomps = parseComps(this);
       this.el.addEventListener(this.data.event, this.on);
     },
+
+    multiple: true,
+
     remove: function() {
       this.el.removeEventListener(this.data.event, this.on);
     },
