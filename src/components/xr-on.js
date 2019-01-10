@@ -15,6 +15,11 @@ Events:
 
 - xr-on, when the initial event has triggered and the component chain starts.
 
+Properties:
+
+- event: Needs to be specified in order to work. This is the initial trigger condition.
+- id: if we want to affect a different entity than ourself, specify the id of that component
+
 Examples:
 
 ```
@@ -64,6 +69,15 @@ Examples:
     }
   }
 
+  function targetElement({ data, el }) {
+    if (data.id) {
+      const t = document.querySelector(`#${data.id}`);
+      if (t) {
+        return t;
+      }
+    }
+    return el;
+  }
 
   function next() {
     if (this.current) {
@@ -90,12 +104,12 @@ Examples:
       // no more waiting means we are at the last batch and need to enable initial trigger condition
         this.el.addEventListener(this.data.event, this.on);
       }
-      const el = this.el;
+      const target = targetElement(this);
       iterNamedNodeMapArr(nextArr, function(idx, name, value) {
         if (idx === 0) {
-          el.setAttribute(name, value, true);
+          target.setAttribute(name, value, true);
         } else {
-          el.setAttribute(name + '__' + idx, value, true);
+          target.setAttribute(name + '__' + idx, value, true);
         }
       });
       this.current = nextArr;
@@ -106,9 +120,9 @@ Examples:
   }
 
   function on(_evt) {
+    this.el.removeEventListener(this.data.event, this.on);
     this.pendingComps = this.xrcomps.slice();
     this.next();
-    this.el.removeEventListener(this.data.event, this.on);
     this.el.emit('xr-on');
   }
 
@@ -135,7 +149,8 @@ Examples:
 
   AFRAME.registerComponent('xr-on', {
     schema: {
-      event: { type: 'string', default: '' }
+      event: { type: 'string', default: '' },
+      id: { type: 'string', default: '' }
     },
     init: function() {
       this.on = on.bind(this);
@@ -143,6 +158,9 @@ Examples:
       this.xrcomps = parseComps(this.el);
       this.el.addEventListener(this.data.event, this.on);
     },
+
+    multiple: true,
+
     remove: function() {
       this.el.removeEventListener(this.data.event, this.on);
     },
