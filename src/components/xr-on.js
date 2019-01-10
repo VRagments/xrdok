@@ -27,7 +27,7 @@ Examples:
 
 ```
 <a-sphere position="0 1.5 -5" color="#F4F7F2" xr-on="event: xr-grabstart" xr-grab>
-  <xr-comp xr-wait="event: grabend" animation="property: material.color; to: #AF0000"></xr-comp>
+  <xr-comp xr-wait="event: xr-grabend" animation="property: material.color; to: #AF0000"></xr-comp>
   <xr-comp animation="property: material.color; to: #F4F7F2"></xr-comp>
 </a-sphere>
 
