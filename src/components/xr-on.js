@@ -11,8 +11,8 @@ All children in front of and including the `xr-wait` component are triggered sim
 The remainder is triggered once the `xr-wait` condition has triggered.
 
 This component can be used multiple times to target different components/events.
-Beware the aframe syntax which is `xr-on__<id>` on multiple instances.
-To associate `xr-comp` children with their respective `xr-on__<id>` parents, simply use `xr-comp__<id>`.
+Beware the aframe syntax which is `xr-on__<name>` on multiple instances.
+To associate `xr-comp` children with their respective `xr-on__<name>` parents, simply use `xr-comp__<name>`.
 
 Events:
 
@@ -27,7 +27,7 @@ Examples:
 
 ```
 <a-sphere position="0 1.5 -5" color="#F4F7F2" xr-on="event: xr-grabstart" xr-grab>
-  <xr-comp xr-wait="event: grabend" animation="property: material.color; to: #AF0000"></xr-comp>
+  <xr-comp xr-wait="event: xr-grabend" animation="property: material.color; to: #AF0000"></xr-comp>
   <xr-comp animation="property: material.color; to: #F4F7F2"></xr-comp>
 </a-sphere>
 
