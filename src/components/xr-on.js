@@ -66,7 +66,7 @@ Examples:
       const namedNodeMap = arr[i];
       for (var j = 0; j < namedNodeMap.length; j++) {
         const attr = namedNodeMap[j];
-        compIndex[attr.name] = compIndex[attr.name] ? compIndex[attr.name] + 1 : 0;
+        compIndex[attr.name] = (compIndex[attr.name] !== undefined) ? compIndex[attr.name] + 1 : 0;
         fn(compIndex[attr.name], attr.name, attr.value);
       }
     }
