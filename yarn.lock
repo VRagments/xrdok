@@ -39,12 +39,6 @@ acorn@^6.0.7:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
 
-aframe-animation-component@^5.1.2:
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/aframe-animation-component/-/aframe-animation-component-5.1.2.tgz#f08becfcde91b0c9d2bf308b03cbdacd85c320d0"
-  dependencies:
-    animejs "2.2.0"
-
 aframe-physics-system@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/aframe-physics-system/-/aframe-physics-system-3.3.0.tgz#b85e2c76dd7e83694bc0371e87c8449f30ac1392"
@@ -90,7 +84,7 @@ an-array@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/an-array/-/an-array-1.0.0.tgz#c125a5bb8257778e35f4b4f6aa9c7d0fa9e42665"
 
-animejs@2.2.0, animejs@^2.2.0:
+animejs@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/animejs/-/animejs-2.2.0.tgz#35eefdfc535b81949c9cb06f0b3e60c02e6fdc80"
 
@@ -573,7 +567,7 @@ debug@^4.0.1:
   dependencies:
     ms "^2.1.1"
 
-"debug@github:ngokevin/debug#noTimestamp":
+debug@ngokevin/debug#noTimestamp:
   version "2.2.0"
   resolved "https://codeload.github.com/ngokevin/debug/tar.gz/ef5f8e66d49ce8bc64c6f282c15f8b7164409e3a"
 
@@ -670,7 +664,7 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-"document-register-element@github:dmarcos/document-register-element#8ccc532b7f3744be954574caf3072a5fd260ca90":
+document-register-element@dmarcos/document-register-element#8ccc532b7f3744be954574caf3072a5fd260ca90:
   version "0.5.4"
   resolved "https://codeload.github.com/dmarcos/document-register-element/tar.gz/8ccc532b7f3744be954574caf3072a5fd260ca90"
 
