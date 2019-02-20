@@ -1,22 +1,22 @@
 let
-  unstable = import (fetchTarball { # nixos-unstable
-    url = https://github.com/NixOS/nixpkgs-channels/archive/c26dbef830a.tar.gz;
-    sha256 = "1bh3c7in7lfainbak1dmn9kwaba07z6wc65g99ylyahcy5g4pb0w";
+  stable = import (fetchTarball { # 18.09
+    url = https://github.com/NixOS/nixpkgs-channels/archive/12b1462924a.tar.gz;
+    sha256 = "138nrcc0p2jmvx69fadh2a69lhnp3pg4cimmbiw6aqi9pgk0ig1j";
   }) {};
 
-  pkgs = import (fetchTarball { # 18.09
-    url = https://github.com/NixOS/nixpkgs-channels/archive/7795a7ad5f0.tar.gz;
-    sha256 = "1kh35ys6f60x35bsav64alqwnzps3xc21m1ayrcms005ylryi34c";
+  unstable = import (fetchTarball { # nixos-unstable
+    url = https://github.com/NixOS/nixpkgs-channels/archive/2d6f84c1090.tar.gz;
+    sha256 = "0l8b51lwxlqc3h6gy59mbz8bsvgc0q6b3gf7p3ib1icvpmwqm773";
   }) {};
-in with pkgs; {
-  pogstateEnv = stdenv.mkDerivation {
+in {
+  pogstateEnv = stable.stdenv.mkDerivation {
     name = "xrdok";
     buildInputs = [
       unstable.firefox-devedition-bin
-      inotifyTools
-      nodejs-8_x
-      stdenv
-      yarn
+      stable.inotifyTools
+      stable.nodejs-8_x
+      stable.stdenv
+      stable.yarn
     ];
   };
 }
