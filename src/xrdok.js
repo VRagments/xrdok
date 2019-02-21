@@ -474,3 +474,62 @@ const XRbutton = 'xr-button';
   });
 
 })();
+
+const XRbuttonicon = 'xr-button-icon';
+(function () {
+
+  AFRAME.registerComponent(XRbuttonicon, {
+    schema: {
+      show: { type: 'string', default: 'always' }, // [ 'toggled' | 'non-toggled' | 'always' ]
+    },
+
+    buttonListener: function(evt) {
+      if (this.data.show === 'toggled') {
+        if (evt.type === EVTbuttonon) {
+          this.el.setAttribute('visible', true);
+        } else {
+          this.el.setAttribute('visible', false);
+        }
+
+      }
+      if (this.data.show === 'non-toggled') {
+        if (evt.type === EVTbuttonoff) {
+          this.el.setAttribute('visible', true);
+        } else {
+          this.el.setAttribute('visible', false);
+        }
+      }
+    },
+
+    init: function() {
+      setTimeout(() => {
+        const button = this.el.parentEl.components[XRbutton];
+        if (button) {
+          // we are in initialization and not yet attached to button child
+          button.el.removeChild(this.el);
+          button.children.inner.appendChild(this.el);
+          this.el.setAttribute('visible', false);
+        } else {
+          // we are most probably attached to button child
+          const button = this.el.parentEl.parentEl.components[XRbutton];
+          this.buttonListener = this.buttonListener.bind(this);
+          button.el.addEventListener(EVTbuttonon, this.buttonListener);
+          button.el.addEventListener(EVTbuttonoff, this.buttonListener);
+          const vis = (this.data.show === 'toggled' && button.state.toggled)
+          || (this.data.show === 'non-toggled' && !button.state.toggled)
+          || (this.data.show !== 'toggled' && this.data.show !== 'non-toggled');
+          this.el.setAttribute('visible', vis);
+        }
+      });
+    },
+
+    remove: function() {
+      const button = this.el.parentEl.parentEl.components[XRbutton];
+      if (button) {
+        button.el.removeEventListener(EVTbuttonon, this.buttonListener);
+        button.el.removeEventListener(EVTbuttonoff, this.buttonListener);
+      }
+    },
+  });
+
+})();

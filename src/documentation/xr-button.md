@@ -1,4 +1,6 @@
 Render a default button that can be used as a simple push button or as a two state toggle button.
+This button does not come with an icon.
+In order to use different button icons you need to attach children to this button. See xr-button-icon.
 
 Implemented for:
 
