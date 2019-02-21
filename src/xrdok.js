@@ -1,7 +1,14 @@
-
 (function() {
 
-  const eventNames = ['xr-grabstart',  'xr-grabend', 'xr-on', 'xr-click'];
+  const eventNames = [
+    'xr-button-click', 
+    'xr-button-off',
+    'xr-button-on',
+    'xr-click', 
+    'xr-grabend', 
+    'xr-grabstart',  
+    'xr-on', 
+  ];
 
   function on(evt) {
     console.log('[xr event]', evt); // eslint-disable-line no-console
