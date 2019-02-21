@@ -14,7 +14,7 @@
     console.log('[xr event]', evt); // eslint-disable-line no-console
   }
 
-  AFRAME.registerComponent('inspect', {
+  AFRAME.registerComponent('xr-inspect', {
     schema: {},
     init: function() {
       const el = this.el;
