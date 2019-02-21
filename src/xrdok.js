@@ -1,4 +1,7 @@
+//
 // events
+//
+
 const EVTbuttonclick = 'xr-button-click';
 const EVTbuttonoff = 'xr-button-off';
 const EVTbuttonon = 'xr-button-on';
@@ -16,6 +19,10 @@ const eventNames = [
   EVTgrabstart,
   EVTon,
 ];
+
+//
+// helpers
+//
 
 const renderstartWithRaycaster = (function() {
 
@@ -71,13 +78,18 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
+//
+//components
+//
+
+const XRinspect = 'xr-inspect';
 (function() {
 
   function on(evt) {
     console.log('[xr event]', evt); // eslint-disable-line no-console
   }
 
-  AFRAME.registerComponent('xr-inspect', {
+  AFRAME.registerComponent(XRinspect, {
     schema: {},
     init: function() {
       const el = this.el;
@@ -95,9 +107,10 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
+const XRclick = 'xr-click';
 (function() {
 
-  const clazz = 'class-xr-click';
+  const clazz = `class-${XRclick}`;
 
   function mousedown(_evt) {
     this.el.emit(EVTclick);
@@ -107,7 +120,7 @@ const renderstartWithRaycaster = (function() {
     setTimeout(() => renderstartWithRaycaster(evt.target.camera, clazz));
   }
 
-  AFRAME.registerComponent('xr-click', {
+  AFRAME.registerComponent(XRclick, {
     schema: {},
     init: function() {
       this.el.classList.add(clazz);
@@ -123,10 +136,10 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
-
+const XRgrab = 'xr-grab';
 (function () {
 
-  const clazz = 'class-xr-grab';
+  const clazz = `class-${XRgrab}`;
 
   function renderstart(evt) {
     renderstartWithRaycaster(evt.target.camera, clazz);
@@ -171,7 +184,7 @@ const renderstartWithRaycaster = (function() {
     this.el.emit(EVTgrabend);
   }
 
-  AFRAME.registerComponent('xr-grab', {
+  AFRAME.registerComponent(XRgrab, {
     schema: {},
     init: function() {
       this.el.classList.add(clazz);
@@ -195,7 +208,7 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
-
+const XRon = 'xr-on';
 (function () {
 
   const nodeComp = 'xr-comp';
@@ -306,7 +319,7 @@ const renderstartWithRaycaster = (function() {
     return parsed;
   }
 
-  AFRAME.registerComponent('xr-on', {
+  AFRAME.registerComponent(XRon, {
     schema: {
       event: { type: 'string', default: '' },
       id: { type: 'string', default: '' }
