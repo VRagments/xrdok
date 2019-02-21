@@ -10,14 +10,13 @@
   </head>
   <body>
     <a-scene>
-      <!--
-        <a-sphere id="bg_sphere" radius="4000" scale="1 1 -1" material="shader: flat; side: back;" src="pic1.jpg"></a-sphere>
-        <a-gltf-model id="sample_model" src="models/mechachu/scene.gltf" position="0 0 -5"></a-gltf-model>
-        <a-box position="3 1 -6" rotation="0 60 0" color="#F014DF" static-body xr-click xr-on="event: xr-click; id: bg_sphere;" >
-          <xr-comp xr-wait="event: xr-click" src="pic2.jpg"></xr-comp>
-          <xr-comp xr-wait="event: xr-click" src="pic3.jpg"></xr-comp>
-          <xr-comp src="pic1.jpg"></xr-comp>
-        </a-box>
+      <a-sphere id="bg_sphere" radius="4000" scale="1 1 -1" material="shader: flat; side: back;" src="models/pic1.jpg"></a-sphere>
+      <a-gltf-model id="sample_model" src="models/mechachu/scene.gltf" position="0 0 -5"></a-gltf-model>
+      <a-box position="3 1 -6" rotation="0 60 0" color="#F014DF" static-body xr-click xr-on="event: xr-click; id: bg_sphere;" >
+        <xr-comp xr-wait="event: xr-click" src="models/pic2.jpg"></xr-comp>
+        <xr-comp xr-wait="event: xr-click" src="models/pic3.jpg"></xr-comp>
+        <xr-comp src="models/pic1.jpg"></xr-comp>
+      </a-box>
       <a-box position="0 1 -3" rotation="0 45 0" color="#0C03DF" static-body xr-click xr-on="event: collide; id: foobar" xr-on__me="event: xr-click;">
         <xr-comp xr-wait='event: collide' animation="property: material.color; to: #DDFFAA"></xr-comp>
         <xr-comp xr-wait='event: collide' animation="property: material.color; to: #0C03DF"></xr-comp>
@@ -28,8 +27,7 @@
         <xr-comp animation="property: material.color; to: #11AA00"></xr-comp>
       </a-box>
       <a-cylinder position="-3 2 -4" color="crimson" height="5" xr-grab dynamic-body></a-cylinder>
-      -->
-      <a-box position="0 1 -5" xr-click inspect></a-box>
+      <a-box position="-2 1 -5" xr-click xr-inspect></a-box>
       <a-plane position="0 -1 0" rotation="-90 0 0" width="1000" height="1000" color="#0CFD90" static-body>
       </a-plane>
       <a-sky color="#ECECEC"></a-sky>
