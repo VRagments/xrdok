@@ -1,14 +1,76 @@
-(function() {
+const XRbuttonclick = 'xr-button-click';
+const XRbuttonoff = 'xr-button-off';
+const XRbuttonon = 'xr-button-on';
+const XRclick = 'xr-click';
+const XRgrabend = 'xr-grabend';
+const XRgrabstart = 'xr-grabstart';
+const XRon = 'xr-on';
 
-  const eventNames = [
-    'xr-button-click', 
-    'xr-button-off',
-    'xr-button-on',
-    'xr-click', 
-    'xr-grabend', 
-    'xr-grabstart',  
-    'xr-on', 
-  ];
+const eventNames = [
+  XRbuttonclick,
+  XRbuttonoff,
+  XRbuttonon,
+  XRclick,
+  XRgrabend,
+  XRgrabstart,
+  XRon,
+];
+
+const renderstartWithRaycaster = (function() {
+
+  const cursorAttr = {
+    fuse: false,
+    rayOrigin: 'mouse',
+  };
+
+  function raycasterAttr(clazz) {
+    return {
+      interval: 250,
+      objects: '.' + clazz,
+    };
+  }
+
+  function findComponent(elements, compName) {
+    for (var i = 0; i < elements.length; i++) {
+      const e = elements[i];
+      if (compName in e.components) {
+        return e;
+      }
+    }
+    return null;
+  }
+
+  return function renderstartWithRaycaster(camera, clazz) {
+    const camEl = camera.el;
+    const raycaster = findComponent(camEl.children, 'raycaster');
+    const cursor = findComponent(camEl.children, 'cursor');
+    if (raycaster || cursor) {
+      if (cursor) {
+        cursor.setAttribute('cursor', cursorAttr);
+      } else {
+        raycaster.setAttribute('cursor', cursorAttr);
+      }
+      if (raycaster) {
+        const objects = raycaster.components.raycaster.attrValue.objects;
+        if (!objects.includes(`.${clazz}`)) {
+          const attr = raycasterAttr(clazz);
+          attr.objects = `${objects}, .${clazz}`, 
+          raycaster.setAttribute('raycaster', attr);
+        }
+      } else {
+        cursor.setAttribute('raycaster', raycasterAttr(clazz));
+      }
+    } else {
+      const ent = document.createElement('a-entity');
+      ent.setAttribute('cursor', cursorAttr);
+      ent.setAttribute('raycaster', raycasterAttr(clazz));
+      camEl.appendChild(ent);
+    }
+  };
+
+})();
+
+(function() {
 
   function on(evt) {
     console.log('[xr event]', evt); // eslint-disable-line no-console
@@ -36,57 +98,12 @@
 (function() {
 
   const clazz = 'class-xr-click';
-  const cursorAttr = {
-    fuse: false,
-    rayOrigin: 'mouse',
-  };
-  const raycasterAttr = {
-    interval: 250,
-    objects: '.' + clazz,
-  };
-
   function mousedown(_evt) {
-    this.el.emit('xr-click');
-  }
-
-  function findComponent(elements, compName) {
-    for (var i = 0; i < elements.length; i++) {
-      const e = elements[i];
-      if (compName in e.components) {
-        return e;
-      }
-    }
-    return null;
+    this.el.emit(XRclick);
   }
 
   function renderstart(evt) {
-    const camera = evt.target.camera;
-    const camEl = camera.el;
-    const raycaster = findComponent(camEl.children, 'raycaster');
-    const cursor = findComponent(camEl.children, 'cursor');
-    if (raycaster || cursor) {
-      if (cursor) {
-        cursor.setAttribute('cursor', cursorAttr);
-      } else {
-        raycaster.setAttribute('cursor', cursorAttr);
-      }
-      if (raycaster) {
-        const objects = raycaster.components.raycaster.attrValue.objects;
-        if (!objects.includes(`.${clazz}`)) {
-          raycaster.setAttribute('raycaster', {
-            interval: raycasterAttr.interval,
-            objects: `${objects}, .${clazz}`,
-          });
-        }
-      } else {
-        cursor.setAttribute('raycaster', raycasterAttr);
-      }
-    } else {
-      const ent = document.createElement('a-entity');
-      ent.setAttribute('cursor', cursorAttr);
-      ent.setAttribute('raycaster', raycasterAttr);
-      camEl.appendChild(ent);
-    }
+    setTimeout(() => renderstartWithRaycaster(evt.target.camera, clazz));
   }
 
   AFRAME.registerComponent('xr-click', {
@@ -109,14 +126,10 @@
 (function () {
 
   const clazz = 'class-xr-grab';
-  const cursorAttr = {
-    fuse: false,
-    rayOrigin: 'mouse',
-  };
-  const raycasterAttr = {
-    interval: 250,
-    objects: '.' + clazz,
-  };
+
+  function renderstart(evt) {
+    renderstartWithRaycaster(evt.target.camera, clazz);
+  }
 
   const copyTransform = (function() {
     const noGCmatrix = new THREE.Matrix4();
@@ -139,7 +152,7 @@
     this.proxyObject3D = new THREE.Object3D();
     evt.detail.cursorEl.object3D.add(this.proxyObject3D);
     copyTransform(this.el.object3D, this.proxyObject3D);
-    this.el.emit('xr-grabstart');
+    this.el.emit(XRgrabstart);
   }
 
   function mouseup(_evt) {
@@ -154,50 +167,8 @@
       this.el.setAttribute('dynamic-body', this.dynamicBody);
       this.dynamicBody = null;
     }
-    this.el.emit('xr-grabend');
+    this.el.emit(XRgrabend);
   }
-
-  function findComponent(elements, compName) {
-    for (var i = 0; i < elements.length; i++) {
-      const e = elements[i];
-      if (compName in e.components) {
-        return e;
-      }
-    }
-    return null;
-  }
-
-
-  function renderstart(evt) {
-    const camera = evt.target.camera;
-    const camEl = camera.el;
-    const raycaster = findComponent(camEl.children, 'raycaster');
-    const cursor = findComponent(camEl.children, 'cursor');
-    if (raycaster || cursor) {
-      if (cursor) {
-        cursor.setAttribute('cursor', cursorAttr);
-      } else {
-        raycaster.setAttribute('cursor', cursorAttr);
-      }
-      if (raycaster) {
-        const objects = raycaster.components.raycaster.attrValue.objects;
-        if (!objects.includes(`.${clazz}`)) {
-          raycaster.setAttribute('raycaster', {
-            interval: raycasterAttr.interval,
-            objects: `${objects}, .${clazz}`,
-          });
-        }
-      } else {
-        cursor.setAttribute('raycaster', raycasterAttr);
-      }
-    } else {
-      const ent = document.createElement('a-entity');
-      ent.setAttribute('cursor', cursorAttr);
-      ent.setAttribute('raycaster', raycasterAttr);
-      camEl.appendChild(ent);
-    }
-  }
-
 
   AFRAME.registerComponent('xr-grab', {
     schema: {},
@@ -234,9 +205,9 @@
       const namedNodeMap = namedNodeMapArray[i];
       const aWait = namedNodeMap.getNamedItem(attrWait);
       if (aWait) {
-        const eNamesSplit = aWait.value.split('event: ');
+        const eNamesSplit = aWait.value.split('event:');
         if (eNamesSplit.length > 1) {
-          return eNamesSplit[1];
+          return eNamesSplit[1].trim();
         }
       }
     }
@@ -309,7 +280,7 @@
     this.el.removeEventListener(this.data.event, this.on);
     this.pendingComps = this.xrcomps.slice();
     this.next();
-    this.el.emit('xr-on');
+    this.el.emit(XRon);
   }
 
   function parseComps({ id, el}) {
