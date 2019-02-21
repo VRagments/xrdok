@@ -9,11 +9,9 @@ Implemented for:
 
 Events:
 
-- xr-button-click, when a click is registered.
-  This will only be called when the click effects the button.
-  Two rapid clicks will result in one effective click.
-- xr-button-on, only triggered on a two state toggle button when pushed on
-- xr-button-off, only triggered on a two state toggle button when pushed off
+- xr-button-click, when a click is registered that would push the button. Two rapid clicks will result in one effective click.
+- xr-button-on, triggered when toggle button hits the on state
+- xr-button-off, triggered when toggle button hits the off state
 
 Properties:
 

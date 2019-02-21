@@ -24,6 +24,11 @@ const eventNames = [
 // helpers
 //
 
+const setAnimation = function(el, animName, animation) {
+  el.removeAttribute(animName);
+  el.setAttribute(animName, animation);
+};
+
 const renderstartWithRaycaster = (function() {
 
   const cursorAttr = {
@@ -62,7 +67,7 @@ const renderstartWithRaycaster = (function() {
         const objects = raycaster.components.raycaster.attrValue.objects;
         if (!objects.includes(`.${clazz}`)) {
           const attr = raycasterAttr(clazz);
-          attr.objects = `${objects}, .${clazz}`, 
+          attr.objects = `${objects}, .${clazz}`,
           raycaster.setAttribute('raycaster', attr);
         }
       } else {
@@ -86,7 +91,7 @@ const XRinspect = 'xr-inspect';
 (function() {
 
   function on(evt) {
-    console.log('[xr event]', evt); // eslint-disable-line no-console
+    console.log('[xr event]', evt.type); // eslint-disable-line no-console
   }
 
   AFRAME.registerComponent(XRinspect, {
@@ -117,7 +122,7 @@ const XRclick = 'xr-click';
   }
 
   function renderstart(evt) {
-    setTimeout(() => renderstartWithRaycaster(evt.target.camera, clazz));
+    renderstartWithRaycaster(evt.target.camera, clazz);
   }
 
   AFRAME.registerComponent(XRclick, {
@@ -335,6 +340,136 @@ const XRon = 'xr-on';
 
     remove: function() {
       this.el.removeEventListener(this.data.event, this.on);
+    },
+  });
+
+})();
+
+
+const XRbutton = 'xr-button';
+(function () {
+
+  const clazz = `class-${XRbutton}`;
+  const defaultColor = '#EBF6FD';
+  const animPunch = 'animation__punch';
+  const animFull = 'animation__full';
+  const animRelease = 'animation__release';
+  const animations = {
+    [animPunch]: {
+      property: 'position',
+      to: '0 0.01 0',
+      dur: 666,
+      easing: 'easeOutElastic',
+    },
+    [animRelease]: {
+      property: 'position',
+      to: '0 0.04 0',
+      dur: 666,
+      easing: 'easeInElastic',
+    },
+    [animFull]: {
+      property: 'position',
+      from: '0 0.04 0',
+      to: '0 0.01 0',
+      dur: 333,
+      easing: 'easeInElastic',
+      dir: 'alternate',
+      loop: 1,
+    }
+  };
+
+  function mousedown(_evt) {
+    if (this.state.clicked) {
+      return;
+    }
+    this.el.emit(EVTbuttonclick);
+    this.state.clicked = true;
+    if (this.data.toggle) {
+      if (this.state.toggled) {
+        this.state.toggled = false;
+        const cb = (evt) => {
+          if (evt.detail.name === animRelease) {
+            this.el.emit(EVTbuttonoff);
+            this.children.inner.removeEventListener('animationcomplete', cb);
+            this.state.clicked = false;
+          }
+        };
+        this.children.inner.addEventListener('animationcomplete', cb);
+        setAnimation(this.children.inner, animRelease, animations[animRelease]);
+      } else {
+        this.state.toggled = true;
+        const cb = (evt) => {
+          if (evt.detail.name === animPunch) {
+            this.el.emit(EVTbuttonon);
+            this.children.inner.removeEventListener('animationcomplete', cb);
+            this.state.clicked = false;
+          }
+        };
+        this.children.inner.addEventListener('animationcomplete', cb);
+        setAnimation(this.children.inner, animPunch, animations[animPunch]);
+      }
+    } else {
+      const cb = (evt) => {
+        if (evt.detail.name === animFull) {
+          this.children.inner.removeEventListener('animationcomplete', cb);
+          this.state.clicked = false;
+        }
+      };
+      this.children.inner.addEventListener('animationcomplete', cb);
+      setAnimation(this.children.inner, animFull, animations[animFull]);
+    }
+  }
+
+  function renderstart(evt) {
+    renderstartWithRaycaster(evt.target.camera, clazz);
+  }
+
+  function determineMaterial(el) {
+    if (el.components.material) {
+      return el.components.material.attrValue;
+    }
+    return { color: defaultColor };
+  }
+
+  AFRAME.registerComponent(XRbutton, {
+    schema: {
+      toggle: { type: 'boolean', default: false },
+    },
+
+    init: function() {
+      // visuals
+      const outer = document.createElement('a-cylinder');
+      outer.setAttribute('height', 0.05);
+      const inner = document.createElement('a-cylinder');
+      inner.setAttribute('height', 0.05);
+      inner.setAttribute('position', '0 0.04 0');
+      inner.setAttribute('radius', 0.9);
+      inner.classList.add(clazz);
+      this.el.appendChild(outer);
+      this.el.appendChild(inner);
+      // logic
+      this.mousedown = mousedown.bind(this);
+      this.el.addEventListener('mousedown', this.mousedown);
+      this.el.sceneEl.addEventListener('renderstart', renderstart);
+      // component dependent, wait for their initialization
+      setTimeout(() => {
+        const mat = determineMaterial(this.el);
+        outer.setAttribute('material', mat);
+        inner.setAttribute('material', mat);
+      });
+      this.children = {
+        inner,
+        outer,
+      };
+      this.state = {
+        clicked: false,
+        toggled: false,
+      };
+    },
+
+    remove: function() {
+      this.el.sceneEl.removeEventListener('renderstart', renderstart);
+      this.el.removeEventListener('mousedown', this.mousedown);
     },
   });
 
