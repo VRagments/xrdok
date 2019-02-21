@@ -12,10 +12,9 @@
     <a-scene>
       <!-- <a-gltf-model src="models/cyberllama_anny/scene.gltf" position="1 3 -6"></a-gltf-model> -->
       <a-entity position="0 1 -3" xr-button="toggle: true;" xr-inspect>
-        <a-box color="green" xr-button-icon="show: toggled"></a-box>
-        <a-box color="red" xr-button-icon="show: non-toggled"></a-box>
+        <a-entity material="color: green" xr-icon-pause xr-button-icon="show: toggled"></a-entity>
+        <a-entity material="color: blue" xr-icon-play xr-button-icon="show: non-toggled"></a-entity>
       </a-entity>
-      <!--
       <a-entity position="0 1.6 0" camera wasd-controls="fly: true; acceleration: 200.00;" look-controls></a-entity>
       <a-sphere id="bg_sphere" radius="4000" scale="1 1 -1" material="shader: flat; side: back;" src="models/pic1.jpg"></a-sphere>
       <a-box position="3 1 -6" rotation="0 60 0" color="#F014DF" static-body xr-click xr-on="event: xr-click; id: bg_sphere;" >
@@ -37,7 +36,6 @@
       <a-plane position="0 -1 0" rotation="-90 0 0" width="1000" height="1000" color="#0CFD90" static-body>
       </a-plane>
       <a-sky color="#ECECEC"></a-sky>
-      -->
     </a-scene>
   </body>
 </html>

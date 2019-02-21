@@ -519,6 +519,8 @@ const XRbuttonicon = 'xr-button-icon';
           || (this.data.show === 'non-toggled' && !button.state.toggled)
           || (this.data.show !== 'toggled' && this.data.show !== 'non-toggled');
           this.el.setAttribute('visible', vis);
+          const pos = button.children.inner.getAttribute('position');
+          this.el.setAttribute('position', pos);
         }
       });
     },
@@ -530,6 +532,91 @@ const XRbuttonicon = 'xr-button-icon';
         button.el.removeEventListener(EVTbuttonoff, this.buttonListener);
       }
     },
+  });
+
+})();
+
+const XRiconplay = 'xr-icon-play';
+(function() {
+
+  function determineMaterial(el) {
+    if (el.components.material) {
+      return el.components.material.attrValue;
+    }
+    return {};
+  }
+
+
+  AFRAME.registerComponent(XRiconplay, {
+    schema: {
+    },
+
+    init: function() {
+      const triangle = document.createElement('a-triangle');
+      triangle.setAttribute('vertex-a', '-0.31 0.5 0');
+      triangle.setAttribute('vertex-b', '-0.31 -0.5 0');
+      triangle.setAttribute('vertex-c', '0.31 0 0');
+      triangle.setAttribute('rotation', '-90 0 0');
+      this.el.appendChild(triangle);
+      this.children = {
+        triangle,
+      };
+      setTimeout(() => {
+        const mat = determineMaterial(this.el);
+        triangle.setAttribute('material', mat);
+      });
+    },
+
+    remove: function() {
+      this.el.removeChild(this.children.triangle);
+    }
+  });
+
+})();
+
+const XRiconpause = 'xr-icon-pause';
+(function() {
+
+  function determineMaterial(el) {
+    if (el.components.material) {
+      return el.components.material.attrValue;
+    }
+    return {};
+  }
+
+  AFRAME.registerComponent(XRiconpause, {
+    schema: {
+    },
+
+    init: function() {
+      const left = document.createElement('a-entity');
+      const right = document.createElement('a-entity');
+      const geo = {
+        primitive: 'plane',
+        width: 0.31,
+      };
+      left.setAttribute('geometry', geo);
+      right.setAttribute('geometry', geo);
+      left.setAttribute('position', '-0.2 0 0');
+      right.setAttribute('position', '0.2 0 0');
+      this.el.appendChild(left);
+      this.el.appendChild(right);
+      this.el.setAttribute('rotation', '-90 0 0');
+      this.children = {
+        left,
+        right,
+      };
+      setTimeout(() => {
+        const mat = determineMaterial(this.el);
+        left.setAttribute('material', mat);
+        right.setAttribute('material', mat);
+      });
+    },
+
+    remove: function() {
+      this.el.removeChild(this.children.left);
+      this.el.removeChild(this.children.right);
+    }
   });
 
 })();
