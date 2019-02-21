@@ -1,19 +1,20 @@
-const XRbuttonclick = 'xr-button-click';
-const XRbuttonoff = 'xr-button-off';
-const XRbuttonon = 'xr-button-on';
-const XRclick = 'xr-click';
-const XRgrabend = 'xr-grabend';
-const XRgrabstart = 'xr-grabstart';
-const XRon = 'xr-on';
+// events
+const EVTbuttonclick = 'xr-button-click';
+const EVTbuttonoff = 'xr-button-off';
+const EVTbuttonon = 'xr-button-on';
+const EVTclick = 'xr-click';
+const EVTgrabend = 'xr-grabend';
+const EVTgrabstart = 'xr-grabstart';
+const EVTon = 'xr-on';
 
 const eventNames = [
-  XRbuttonclick,
-  XRbuttonoff,
-  XRbuttonon,
-  XRclick,
-  XRgrabend,
-  XRgrabstart,
-  XRon,
+  EVTbuttonclick,
+  EVTbuttonoff,
+  EVTbuttonon,
+  EVTclick,
+  EVTgrabend,
+  EVTgrabstart,
+  EVTon,
 ];
 
 const renderstartWithRaycaster = (function() {
@@ -94,12 +95,12 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
-
 (function() {
 
   const clazz = 'class-xr-click';
+
   function mousedown(_evt) {
-    this.el.emit(XRclick);
+    this.el.emit(EVTclick);
   }
 
   function renderstart(evt) {
@@ -152,7 +153,7 @@ const renderstartWithRaycaster = (function() {
     this.proxyObject3D = new THREE.Object3D();
     evt.detail.cursorEl.object3D.add(this.proxyObject3D);
     copyTransform(this.el.object3D, this.proxyObject3D);
-    this.el.emit(XRgrabstart);
+    this.el.emit(EVTgrabstart);
   }
 
   function mouseup(_evt) {
@@ -167,7 +168,7 @@ const renderstartWithRaycaster = (function() {
       this.el.setAttribute('dynamic-body', this.dynamicBody);
       this.dynamicBody = null;
     }
-    this.el.emit(XRgrabend);
+    this.el.emit(EVTgrabend);
   }
 
   AFRAME.registerComponent('xr-grab', {
@@ -280,7 +281,7 @@ const renderstartWithRaycaster = (function() {
     this.el.removeEventListener(this.data.event, this.on);
     this.pendingComps = this.xrcomps.slice();
     this.next();
-    this.el.emit(XRon);
+    this.el.emit(EVTon);
   }
 
   function parseComps({ id, el}) {
