@@ -41,10 +41,10 @@ abstraction.
 
 ### XRDok components
 
-[xr-click](src/documentation/xr-click.md)
-[xr-inspect](src/documentation/xr-inspect.md)
-[xr-grab](src/documentation/xr-grab.md)
-[xr-icons](src/documentation/xr-icons.md)
-[xr-button](src/documentation/xr-button.md)
-[xr-button-icon](src/documentation/xr-button-icon.md)
-[xr-on](src/documentation/xr-on.md)
+* [xr-click](src/documentation/xr-click.md)
+* [xr-inspect](src/documentation/xr-inspect.md)
+* [xr-grab](src/documentation/xr-grab.md)
+* [xr-icons](src/documentation/xr-icons.md)
+* [xr-button](src/documentation/xr-button.md)
+* [xr-button-icon](src/documentation/xr-button-icon.md)
+* [xr-on](src/documentation/xr-on.md)
