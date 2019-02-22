@@ -239,8 +239,10 @@ const XRon = 'xr-on';
       const namedNodeMap = arr[i];
       for (var j = 0; j < namedNodeMap.length; j++) {
         const attr = namedNodeMap[j];
-        compIndex[attr.name] = (compIndex[attr.name] !== undefined) ? compIndex[attr.name] + 1 : 0;
-        fn(compIndex[attr.name], attr.name, attr.value);
+        if (attr.name !== attrWait) {
+          compIndex[attr.name] = (compIndex[attr.name] !== undefined) ? compIndex[attr.name] + 1 : 0;
+          fn(compIndex[attr.name], attr.name, attr.value);
+        }
       }
     }
   }
@@ -277,7 +279,7 @@ const XRon = 'xr-on';
       if (eName) {
         this.el.addEventListener(eName, this.next);
       } else {
-      // no more waiting means we are at the last batch and need to enable initial trigger condition
+        // no more waiting means we are at the last batch and need to enable initial trigger condition
         this.el.addEventListener(this.data.event, this.on);
       }
       const target = targetElement(this);
@@ -290,7 +292,7 @@ const XRon = 'xr-on';
       });
       this.current = nextArr;
     } else {
-    // if the last component had a wait event, we will land here. only thing to do is to enable initial trigger condition
+      // if the last component had a wait event, we will land here. only thing to do is to enable initial trigger condition
       this.el.addEventListener(this.data.event, this.on);
     }
   }
