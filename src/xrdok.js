@@ -626,7 +626,6 @@ const XRicondots = 'xr-icon-dots';
         this.el.appendChild(d);
         return d;
       });
-      // this.el.setAttribute('rotation', '-90 0 0');
       this.children = { dots };
       setTimeout(() => {
         const mat = myMaterialOrEmpty(this.el);
@@ -638,6 +637,46 @@ const XRicondots = 'xr-icon-dots';
       this.children.dots.forEach(d => {
         this.el.removeChild(d);
       });
+    }
+  });
+
+})();
+
+const XRiconchevron = 'xr-icon-chevron';
+(function() {
+
+  AFRAME.registerComponent(XRiconchevron, {
+    schema: {},
+
+    init: function() {
+      const geo = {
+        primitive: 'plane',
+        height: 0.5,
+        width: 0.1,
+      };
+      const left = document.createElement('a-entity');
+      const right = document.createElement('a-entity');
+      left.setAttribute('geometry', geo);
+      right.setAttribute('geometry', geo);
+      left.setAttribute('rotation', "-90 45 0");
+      left.setAttribute('position', "-0.143 0 0.1");
+      right.setAttribute('rotation', "-90 -45 0");
+      right.setAttribute('position', "0.143 0 0.1");
+      this.el.appendChild(left);
+      this.el.appendChild(right);
+      this.children = {
+        left,
+        right,
+      };
+      setTimeout(() => {
+        const mat = myMaterialOrEmpty(this.el);
+        left.setAttribute('material', mat);
+        right.setAttribute('material', mat);
+      });
+    },
+
+    remove: function() {
+      Object.values(this.children).forEach(v => this.el.removeChild(v));
     }
   });
 
