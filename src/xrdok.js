@@ -29,7 +29,7 @@ const myMaterialOrEmpty = function(el) {
     return el.components.material.attrValue;
   }
   return {};
-}
+};
 
 const setAnimation = function(el, animName, animation) {
   el.removeAttribute(animName);
@@ -658,10 +658,10 @@ const XRiconchevron = 'xr-icon-chevron';
       const right = document.createElement('a-entity');
       left.setAttribute('geometry', geo);
       right.setAttribute('geometry', geo);
-      left.setAttribute('rotation', "-90 45 0");
-      left.setAttribute('position', "-0.143 0 0.1");
-      right.setAttribute('rotation', "-90 -45 0");
-      right.setAttribute('position', "0.143 0 0.1");
+      left.setAttribute('rotation', '-90 45 0');
+      left.setAttribute('position', '-0.143 0 0.1');
+      right.setAttribute('rotation', '-90 -45 0');
+      right.setAttribute('position', '0.143 0 0.1');
       this.el.appendChild(left);
       this.el.appendChild(right);
       this.children = {
