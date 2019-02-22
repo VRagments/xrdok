@@ -555,8 +555,8 @@ const XRiconplay = 'xr-icon-play';
 
     init: function() {
       const triangle = document.createElement('a-triangle');
-      triangle.setAttribute('vertex-a', '-0.31 0.5 0');
-      triangle.setAttribute('vertex-b', '-0.31 -0.5 0');
+      triangle.setAttribute('vertex-a', '-0.31 0.31 0');
+      triangle.setAttribute('vertex-b', '-0.31 -0.31 0');
       triangle.setAttribute('vertex-c', '0.31 0 0');
       triangle.setAttribute('rotation', '-90 0 0');
       this.el.appendChild(triangle);
@@ -576,7 +576,7 @@ const XRiconplay = 'xr-icon-play';
 
 })();
 
-const XRiconpause = 'xr-icon-pause';
+const XRiconstop = 'xr-icon-stop';
 (function() {
 
   function determineMaterial(el) {
@@ -586,38 +586,29 @@ const XRiconpause = 'xr-icon-pause';
     return {};
   }
 
-  AFRAME.registerComponent(XRiconpause, {
+  AFRAME.registerComponent(XRiconstop, {
     schema: {
     },
 
     init: function() {
-      const left = document.createElement('a-entity');
-      const right = document.createElement('a-entity');
+      const quad = document.createElement('a-entity');
       const geo = {
         primitive: 'plane',
-        width: 0.26,
+        width: 0.62,
+        height: 0.62,
       };
-      left.setAttribute('geometry', geo);
-      right.setAttribute('geometry', geo);
-      left.setAttribute('position', '-0.18 0 0');
-      right.setAttribute('position', '0.18 0 0');
-      this.el.appendChild(left);
-      this.el.appendChild(right);
+      quad.setAttribute('geometry', geo);
+      this.el.appendChild(quad);
       this.el.setAttribute('rotation', '-90 0 0');
-      this.children = {
-        left,
-        right,
-      };
+      this.children = { quad };
       setTimeout(() => {
         const mat = determineMaterial(this.el);
-        left.setAttribute('material', mat);
-        right.setAttribute('material', mat);
+        quad.setAttribute('material', mat);
       });
     },
 
     remove: function() {
-      this.el.removeChild(this.children.left);
-      this.el.removeChild(this.children.right);
+      this.el.removeChild(this.children.quad);
     }
   });
 

@@ -27,8 +27,8 @@
 
       <!-- toggle button for audio playing -->
       <a-entity position="2.2 1 -3" xr-button="toggle: true;" xr-on="event: xr-button-on">
-        <a-entity material="color: green" xr-icon-pause xr-button-icon="show: toggled"></a-entity>
-        <a-entity material="color: blue" xr-icon-play xr-button-icon="show: non-toggled"></a-entity>
+        <a-entity material="color: red" xr-icon-stop xr-button-icon="show: toggled"></a-entity>
+        <a-entity material="color: green" xr-icon-play xr-button-icon="show: non-toggled"></a-entity>
         <xr-comp xr-wait="event: xr-button-off" sound="src: models/sound1.ogg; autoplay: true;"></xr-comp>
       </a-entity>
 
