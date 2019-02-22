@@ -24,6 +24,13 @@ const eventNames = [
 // helpers
 //
 
+const myMaterialOrEmpty = function(el) {
+  if (el.components.material) {
+    return el.components.material.attrValue;
+  }
+  return {};
+};
+
 const setAnimation = function(el, animName, animation) {
   el.removeAttribute(animName);
   el.setAttribute(animName, animation);
@@ -521,8 +528,9 @@ const XRbuttonicon = 'xr-button-icon';
             || (this.data.show === 'non-toggled' && !button.state.toggled)
             || (this.data.show !== 'toggled' && this.data.show !== 'non-toggled');
           this.el.setAttribute('visible', vis);
-          const pos = button.children.inner.getAttribute('position');
-          this.el.setAttribute('position', pos);
+          const innerPos = button.children.inner.getAttribute('position');
+          const ourPos = this.el.getAttribute('position');
+          ourPos.y += innerPos.y;
         }
       });
     },
@@ -541,14 +549,6 @@ const XRbuttonicon = 'xr-button-icon';
 const XRiconplay = 'xr-icon-play';
 (function() {
 
-  function determineMaterial(el) {
-    if (el.components.material) {
-      return el.components.material.attrValue;
-    }
-    return {};
-  }
-
-
   AFRAME.registerComponent(XRiconplay, {
     schema: {
     },
@@ -564,7 +564,7 @@ const XRiconplay = 'xr-icon-play';
         triangle,
       };
       setTimeout(() => {
-        const mat = determineMaterial(this.el);
+        const mat = myMaterialOrEmpty(this.el);
         triangle.setAttribute('material', mat);
       });
     },
@@ -579,16 +579,8 @@ const XRiconplay = 'xr-icon-play';
 const XRiconstop = 'xr-icon-stop';
 (function() {
 
-  function determineMaterial(el) {
-    if (el.components.material) {
-      return el.components.material.attrValue;
-    }
-    return {};
-  }
-
   AFRAME.registerComponent(XRiconstop, {
-    schema: {
-    },
+    schema: {},
 
     init: function() {
       const quad = document.createElement('a-entity');
@@ -602,13 +594,89 @@ const XRiconstop = 'xr-icon-stop';
       this.el.setAttribute('rotation', '-90 0 0');
       this.children = { quad };
       setTimeout(() => {
-        const mat = determineMaterial(this.el);
+        const mat = myMaterialOrEmpty(this.el);
         quad.setAttribute('material', mat);
       });
     },
 
     remove: function() {
       this.el.removeChild(this.children.quad);
+    }
+  });
+
+})();
+
+const XRicondots = 'xr-icon-dots';
+(function() {
+
+  AFRAME.registerComponent(XRicondots, {
+    schema: {},
+
+    init: function() {
+      const positions = [-0.31, 0, 0.31];
+      const geo = {
+        primitive: 'cylinder',
+        height: 0.001,
+        radius: 0.1,
+      };
+      const dots = positions.map(p => {
+        const d = document.createElement('a-entity');
+        d.setAttribute('geometry', geo);
+        d.setAttribute('position', `${p} 0 0`);
+        this.el.appendChild(d);
+        return d;
+      });
+      this.children = { dots };
+      setTimeout(() => {
+        const mat = myMaterialOrEmpty(this.el);
+        dots.forEach(d => d.setAttribute('material', mat));
+      });
+    },
+
+    remove: function() {
+      this.children.dots.forEach(d => {
+        this.el.removeChild(d);
+      });
+    }
+  });
+
+})();
+
+const XRiconchevron = 'xr-icon-chevron';
+(function() {
+
+  AFRAME.registerComponent(XRiconchevron, {
+    schema: {},
+
+    init: function() {
+      const geo = {
+        primitive: 'plane',
+        height: 0.5,
+        width: 0.1,
+      };
+      const left = document.createElement('a-entity');
+      const right = document.createElement('a-entity');
+      left.setAttribute('geometry', geo);
+      right.setAttribute('geometry', geo);
+      left.setAttribute('rotation', '-90 45 0');
+      left.setAttribute('position', '-0.143 0 0.1');
+      right.setAttribute('rotation', '-90 -45 0');
+      right.setAttribute('position', '0.143 0 0.1');
+      this.el.appendChild(left);
+      this.el.appendChild(right);
+      this.children = {
+        left,
+        right,
+      };
+      setTimeout(() => {
+        const mat = myMaterialOrEmpty(this.el);
+        left.setAttribute('material', mat);
+        right.setAttribute('material', mat);
+      });
+    },
+
+    remove: function() {
+      Object.values(this.children).forEach(v => this.el.removeChild(v));
     }
   });
 

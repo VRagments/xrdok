@@ -10,37 +10,21 @@
   </head>
   <body>
     <a-scene>
+      <!-- simple sky to have a background color -->
+      <a-sky color="lightblue"></a-sky>
+      <!-- simulated basic ground -->
+      <a-plane position="0 -1 0" rotation="-90 0 0" width="1000" height="1000" color="#0CFD90" static-body></a-plane>
+
       <!-- camera in fly mode and with faster movement -->
+      <!--
       <a-entity position="0 1.6 0" camera wasd-controls="fly: true; acceleration: 200.00;" look-controls></a-entity>
-
-      <!-- a button showing an image when toggled on -->
-      <a-entity id="mypic" position="0 2 -4" scale="2 1 1"> </a-entity>
-      <a-entity position="0 1 -3" xr-inspect xr-button="toggle: true;" xr-on="event: xr-button-on; id: mypic;">
-        <a-plane rotation="-90 0 0" scale="1 0.5 1" material="color: cyan" xr-button-icon="show: always"></a-plane>
-        <xr-comp geometry="primitive: plane"
-          material="src: models/2dpic.jpg; shader: flat; side: double; transparent: true;"
-          xr-wait="event: xr-button-off"
-        ></xr-comp>
-      </a-entity>
-
-      <!-- toggle button for audio playing -->
-      <!--
-      <a-entity position="2.2 1 -3" xr-button="toggle: true;" xr-on="event: xr-button-on">
-        <a-entity material="color: red" xr-icon-stop xr-button-icon="show: toggled"></a-entity>
-        <a-entity material="color: green" xr-icon-play xr-button-icon="show: non-toggled"></a-entity>
-        <xr-comp xr-wait="event: xr-button-off" sound="src: models/sound1.ogg; autoplay: true;"></xr-comp>
-      </a-entity>
       -->
 
-      <!-- background sphere with button to toggle its source -->
+      <!-- a box showing the output that xr-inspect prints -->
       <!--
-      <a-sphere id="bg_sphere" radius="4000" scale="1 1 -1" material="shader: flat; side: back;" src="models/pic1.jpg"></a-sphere>
-      <a-entity scale="0.5 2 0.5" rotation="45 0 0" position="3 1 -6" material="color: #F014DF" xr-button xr-on="event: xr-button-click; id: bg_sphere;" >
-        <xr-comp xr-wait="event: xr-button-click" src="models/pic2.jpg"></xr-comp>
-        <xr-comp xr-wait="event: xr-button-click" src="models/pic3.jpg"></xr-comp>
-        <xr-comp src="models/pic1.jpg"></xr-comp>
-      </a-entity>
+      <a-box position="-3 1 -2" color="yellow" xr-click xr-inspect></a-box>
       -->
+
 
       <!-- several boxes and a cylinder that can be grabbed.
            both boxes react on click and one box will react on touch with the cylinder to change the color of the other box
@@ -58,17 +42,103 @@
       <a-cylinder position="-3 2 -4" color="crimson" height="5" xr-grab dynamic-body></a-cylinder>
       -->
 
-      <!-- a box showing the output that xr-inspect prints -->
-      <!--
-      <a-box position="-3 1 -2" color="yellow" xr-click xr-inspect></a-box>
-      -->
-
-      <!-- simulated basic ground -->
-      <a-plane position="0 -1 0" rotation="-90 0 0" width="1000" height="1000" color="#0CFD90" static-body></a-plane>
 
       <!-- display a gltf-model -->
       <!--
         <a-gltf-model src="models/cyberllama_anny/scene.gltf" position="1 3 -6"></a-gltf-model>
+      -->
+
+
+      <!-- toggle button for audio playing -->
+      <!--
+      <a-entity position="2.2 1 -3" xr-button="toggle: true;" xr-on="event: xr-button-on">
+        <a-entity material="color: red" xr-icon-stop xr-button-icon="show: toggled"></a-entity>
+        <a-entity material="color: green" xr-icon-play xr-button-icon="show: non-toggled"></a-entity>
+        <xr-comp xr-wait="event: xr-button-off" sound="src: models/sound1.ogg; autoplay: true;"></xr-comp>
+      </a-entity>
+      -->
+
+
+      <!-- a button showing an image when toggled on -->
+      <!--
+      <a-entity id="mypic" position="0 2 -4" scale="2 1 1"> </a-entity>
+      <a-entity position="0 1 -3" xr-inspect xr-button="toggle: true;" xr-on="event: xr-button-on; id: mypic;">
+        <a-plane rotation="-90 0 0" scale="1 0.5 1" material="color: cyan" xr-button-icon="show: always"></a-plane>
+        <xr-comp geometry="primitive: plane"
+          material="src: models/2dpic.jpg; shader: flat; side: double; transparent: true;"
+          xr-wait="event: xr-button-off"
+        ></xr-comp>
+      </a-entity>
+      -->
+
+
+      <!-- background sphere with button to toggle its source -->
+      <!--
+      <a-sphere id="bg_sphere" radius="4000" scale="1 1 -1" material="shader: flat; side: back;" src="models/pic1.jpg"></a-sphere>
+      <a-entity scale="0.5 2 0.5" rotation="45 0 0" position="3 1 -6" material="color: #F014DF" xr-button xr-on="event: xr-button-click; id: bg_sphere;" >
+        <xr-comp xr-wait="event: xr-button-click" src="models/pic2.jpg"></xr-comp>
+        <xr-comp xr-wait="event: xr-button-click" src="models/pic3.jpg"></xr-comp>
+        <xr-comp src="models/pic1.jpg"></xr-comp>
+      </a-entity>
+      -->
+
+
+      <!-- a two state text card that will expand to its long form when a button is clicked -->
+      <!--
+      <a-entity id="text_container" position="0 1.5 -1" rotation="-30 0 0">
+        <a-entity
+          id="text_content"
+          text="value: Short explanation; color: black;"
+        ></a-entity>
+        <a-entity
+          id="text_background"
+          geometry="primitive: plane"
+          material="color: lightgrey"
+          scale="0.6 0.20 1"
+          position="-0.22 0 0"
+        ></a-entity>
+        <a-entity
+          rotation="90 0 0"
+          scale="0.08 0.3 0.08"
+          position="-0.01 0 0"
+          material="color: #aaaaa0"
+          xr-button="toggle: true;"
+          xr-on__container="event: xr-button-on; id: text_container;"
+          xr-on__content="event: xr-button-on; id: text_content;"
+          xr-on__background="event: xr-button-on; id: text_background;"
+        >
+          <a-entity
+            xr-button-icon="show: non-toggled"
+            xr-icon-dots
+            material="color: #888880"
+          ></a-entity>
+          <a-entity
+            xr-button-icon="show: toggled"
+            xr-icon-chevron
+            material="color: #888880"
+          ></a-entity>
+          <xr-comp__container xr-wait="event: xr-button-off" animation="property: rotation; to: 0 0 0; dur: 666"></xr-comp__container>
+          <xr-comp__container animation="property: rotation; to: -30 0 0; dur: 666"></xr-comp__container>
+          <xr-comp__content
+            xr-wait="event: xr-button-off"
+            text="value: This is a long\nexplanation. Real\nwall of text here.\nEven more text to\nshow and really\nreally long.; color: black;"
+            animation="property: position; to: 0 0.1 0; dur: 666;"
+          ></xr-comp__content>
+          <xr-comp__content
+            text="value: Short explanation; color: black;"
+            animation="property: position; to: 0 0 0; dur: 666;"
+          ></xr-comp__content>
+          <xr-comp__background
+            xr-wait="event: xr-button-off"
+            animation__scale="property: scale; to: 0.6 0.4 0; dur: 666"
+            animation__position="property: position; to: -0.22 0.1 0; dur: 666"
+          ></xr-comp__background>
+          <xr-comp__background
+            animation__scale="property: scale; to: 0.6 0.2 0; dur: 666"
+            animation__position="property: position; to: -0.22 0 0; dur: 666"
+          ></xr-comp__background>
+        </a-entity>
+      </a-entity>
       -->
     </a-scene>
   </body>
