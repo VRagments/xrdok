@@ -263,12 +263,12 @@ const XRon = 'xr-on';
       if (eName) {
         this.el.removeEventListener(eName, this.next);
       }
-      const el = this.el;
+      const target = targetElement(this);
       iterNamedNodeMapArr(this.current, function(idx, name, _val) {
         if (idx === 0) {
-          el.removeAttribute(name);
+          target.removeAttribute(name);
         } else {
-          el.removeAttribute(name + '__' + idx);
+          target.removeAttribute(name + '__' + idx);
         }
       });
       this.current = null;
