@@ -516,8 +516,8 @@ const XRbuttonicon = 'xr-button-icon';
           button.el.addEventListener(EVTbuttonon, this.buttonListener);
           button.el.addEventListener(EVTbuttonoff, this.buttonListener);
           const vis = (this.data.show === 'toggled' && button.state.toggled)
-          || (this.data.show === 'non-toggled' && !button.state.toggled)
-          || (this.data.show !== 'toggled' && this.data.show !== 'non-toggled');
+            || (this.data.show === 'non-toggled' && !button.state.toggled)
+            || (this.data.show !== 'toggled' && this.data.show !== 'non-toggled');
           this.el.setAttribute('visible', vis);
           const pos = button.children.inner.getAttribute('position');
           this.el.setAttribute('position', pos);
@@ -593,12 +593,12 @@ const XRiconpause = 'xr-icon-pause';
       const right = document.createElement('a-entity');
       const geo = {
         primitive: 'plane',
-        width: 0.31,
+        width: 0.26,
       };
       left.setAttribute('geometry', geo);
       right.setAttribute('geometry', geo);
-      left.setAttribute('position', '-0.2 0 0');
-      right.setAttribute('position', '0.2 0 0');
+      left.setAttribute('position', '-0.18 0 0');
+      right.setAttribute('position', '0.18 0 0');
       this.el.appendChild(left);
       this.el.appendChild(right);
       this.el.setAttribute('rotation', '-90 0 0');
