@@ -292,9 +292,9 @@ const XRon = 'xr-on';
       const target = targetElement(this);
       iterNamedNodeMapArr(nextArr, function(idx, name, value) {
         if (idx === 0) {
-          target.setAttribute(name, value, true);
+          target.setAttribute(name, value);
         } else {
-          target.setAttribute(name + '__' + idx, value, true);
+          target.setAttribute(name + '__' + idx, value);
         }
       });
       this.current = nextArr;
