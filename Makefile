@@ -12,6 +12,7 @@ run-dev: ## setup development watches and server to run on dev
 	mkdir -p www/models/
 	cp ./node_modules/aframe/dist/aframe-master.* www/
 	cp ./node_modules/aframe-physics-system/dist/aframe-physics-system.js www/
+	cp ./node_modules/papaparse/papaparse.min.js www/
 	cp -r src/* www/
 	cp -r models/* www/models/
 	./node_modules/.bin/chokidar src/ -c 'cp -r src/* www/; cp -r models/* www/models/' & \
