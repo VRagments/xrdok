@@ -732,19 +732,219 @@ const XRiconchevron = 'xr-icon-chevron';
 const XRplanegraph = 'xr-plane-graph';
 (function () {
 
+  function createLegend(data) {
+    var offset = data.primaryValues[0];
+    var legendEl = document.createElement('a-entity');
+    legendEl.setAttribute('id', 'legend-parent');
+    const sec = data.secondaryValuesBase;
+    var gridEl = document.createElement('a-entity');
+    const count = data.primaryValues.length;
+    const maxVal = Math.max(...data.primaryValues);
+    const minVal = Math.min(...data.primaryValues);
+
+    // create geometry and elements
+    for (var j=0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+      // attach label line
+      const prim = data.primaryValues[j]-offset;
+      const label = document.createElement('a-text');
+      const line = document.createElement('a-entity');
+      
+      legendEl.appendChild(line);
+      line.setAttribute('line',
+        `start: ${sec} ${prim+0.3} ${-j*data.segmentLength};
+         end: ${sec} ${prim} ${-j*data.segmentLength};
+         color: white;
+        `
+      );
+      // attach label
+      legendEl.appendChild(label);
+      label.setAttribute('value', data.primaryValues[j]);
+      label.setAttribute('color', '#e31818');
+      label.setAttribute('position', `${sec} ${prim+0.5} ${-j*data.segmentLength}`);
+    }
+
+    // create grid
+    for (var n = Math.floor(minVal); n <= Math.ceil(maxVal); n++) {
+      const line = document.createElement('a-entity');
+      line.setAttribute('line',
+        `start: ${sec} ${n-offset} 0; 
+         end: ${sec} ${n-offset} -${count * data.segmentLength};
+         color: white;
+        `
+      );
+      gridEl.appendChild(line);
+    }
+
+    legendEl.appendChild(gridEl);
+
+    return legendEl;
+  }
+
+  function updateLegend(data, el) {
+    console.log('Updating legend');
+  }
+
+  function createGeometryLine(data) {
+    var offset = data.primaryValues[0];
+    var lineGraphEl = document.createElement('a-entity');
+    lineGraphEl.setAttribute('id', 'line-graph-parent');
+    var lineGraphGeo = new THREE.Geometry();
+    var lineGraphMat = new THREE.LineBasicMaterial({
+      color: 'white',
+      linewidth: 15,
+    });
+    const sec = data.secondaryValuesBase;
+
+    // create geometry
+    for (var j=0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+      //get const 
+      const prim = data.primaryValues[j]-offset;
+
+      // create vertices
+      lineGraphGeo.vertices.push(
+        new THREE.Vector3(sec, prim, -j*data.segmentLength)
+      );
+    }
+    
+    // create mesh
+    var lineGraph = new THREE.Line(lineGraphGeo, lineGraphMat);
+    lineGraphEl.setObject3D('xr-line-graph', lineGraph);
+
+    return lineGraphEl;
+  }
+
+  function updateGeometryLine(data, el) {
+    console.log('Updating line');
+  }
+
+  function createGeometryPlane(data) {
+
+    var offset = data.primaryValues[0];
+    var planeGraphEl = document.createElement('a-entity');
+    planeGraphEl.setAttribute('id', 'plane-graph-parent');
+    var planeGraphGeo = new THREE.Geometry();
+    var planeGraphMat = new THREE.MeshStandardMaterial();
+    
+    // create geometry
+    for (var j = 0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+      // get const
+      const prim = data.primaryValues[j]-offset;
+      const sec = data.secondaryValuesBase * data.secondaryValues[j]/100;
+      const linePath = document.createElement('a-entity');
+
+      // create vertices
+      planeGraphGeo.vertices.push(
+        new THREE.Vector3(-sec, prim, -j*data.segmentLength),
+        new THREE.Vector3(sec, prim, -j*data.segmentLength)
+      );
+
+      // create faces and material indices
+      if (j > 0) {
+        var step = j*2-2;
+        planeGraphGeo.faces.push(
+          new THREE.Face3(step, step+1, step+2),
+          new THREE.Face3(step+1, step+3, step+2)
+        );
+        planeGraphGeo.faces[step].materialIndex = step;
+        planeGraphGeo.faces[step+1].materialIndex = step;
+      }
+      // attach line path
+      planeGraphEl.appendChild(linePath);
+      linePath.setAttribute('line',
+        `start: ${-data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
+         end: ${data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
+         color: white;
+        `
+      );
+    }
+
+    // create material
+    planeGraphMat.side = THREE.DoubleSide;
+    planeGraphMat.transparent = true;
+    planeGraphMat.opacity = 1;
+
+    // create mesh
+    var planeGraphMesh = new THREE.Mesh(planeGraphGeo, planeGraphMat);
+    planeGraphEl.setObject3D('xr-plane-graph', planeGraphMesh);
+
+    return planeGraphEl;
+  }
+
+  function updateGeometryPlane(data, el) {
+    console.log('Updating plane');
+  }
+
+  function createData(data, el) {
+    // parse CSV, if available
+    Papa.parse(data.src, {  // eslint-disable-line no-undef
+      download: true,
+      complete: function(res) {
+        data.descriptors = [];
+        data.primaryValues = [];
+        data.secondaryValues = [];
+        for (var i = 0; i < res.data.length-1; i++) {
+          data.descriptors.push(res.data[i][0]);
+          data.primaryValues.push(parseFloat(res.data[i][1]/10));
+          data.secondaryValues.push(parseInt(res.data[i][2]));
+        }
+
+        if (data.showLine) {
+          console.log('[CREATE] appending line graph');
+          el.appendChild(createGeometryLine(data));
+        }
+        if (data.showGraph) {
+          console.log('[CREATE] appending plane graph');
+          el.appendChild(createGeometryPlane(data));
+        }
+        if (data.showLegend) {
+          console.log('[CREATE] appending legend');
+          el.appendChild(createLegend(data));
+        }
+      }
+    });
+  }
+
+  function updateData(data, el) {
+
+    // remove all former elements
+    var oldLine = document.getElementById('line-graph-parent');
+    if (oldLine != null) {
+      updateGeometryLine(oldLine, data);
+    } else {
+      console.log('appending line graph');
+      el.appendChild(createGeometryLine(data));
+    }
+    var oldPlane = document.getElementById('plane-graph-parent');
+    if (oldPlane != null) {
+      updateGeometryPlane(oldPlane, data);
+    } else {
+      console.log('appending plane graph');
+      el.appendChild(createGeometryPlane(data));
+    }
+    var oldLegend = document.getElementById('legend-parent');
+    if (oldLegend != null) {
+      updateLegend(oldLegend, data);
+    } else {
+      console.log('appending legend');
+      el.appendChild(createLegend(data));
+    }
+  }
+
   AFRAME.registerComponent(XRplanegraph, {
 
     schema: {
       color: { type: 'color', default: '#CCF'},
       colorMax: { type: 'color', default: '#FCC'},
       colorMin: { type: 'color', default: '#CCF'},
-      descriptors: {type: 'array', default: [ '1960', '1970', '1980', '1990', '2000', '2010', '2020' ] },
-      primaryValues: { type: 'array', default: [ 6.8, 7, 7.5, 7, 8, 9, 9.5 ] },
+      descriptors: {type: 'array', default: [] },
+      primaryValues: { type: 'array', default: [] },
       primaryValuesBase: { type: 'number', default: 0},
-      secondaryValues: { type: 'array', default: [ 41, 40, 35, 36, 32, 28, 10 ] },
+      secondaryValues: { type: 'array', default: [] },
       secondaryValuesBase: { type: 'number', default: 3.65 },
       segmentLength: { type: 'number', default: 2 },
-      showAsLine: { type: 'boolean', default: false},
+      showGraph: { type: 'boolean', default: true},
+      showLegend: { type: 'boolean', default: true},
+      showLine: { type: 'boolean', default: true},
       src: { type: 'string', default: './models/lufttemperatur_bbb_sortiert.csv'},
     },
 
@@ -753,105 +953,27 @@ const XRplanegraph = 'xr-plane-graph';
       var data = this.data;
       var el = this.el;
 
-      let self = this;
+      createData(data, el);
+    },
 
-      // parse CSV, if available
-      Papa.parse(data.src, {  // eslint-disable-line no-undef
-        download: true,
-        complete: function(res) {
-          data.descriptors = [];
-          data.primaryValues = [];
-          data.secondaryValues = [];
-          for (var i = 0; i < res.data.length-1; i++) {
-            data.descriptors.push(res.data[i][0]);
-            data.primaryValues.push(parseFloat(res.data[i][1]/10));
-            data.secondaryValues.push(parseInt(res.data[i][2]));
-          }
+    update: function(oldData) {
+      var data = this.data;
+      var el = this.el;
 
-          self.geometry = new THREE.Geometry();
-          
-          if (data.showAsLine) {
-            self.createGeometryLine(el, self, data);
-          } else {
-            self.createGeometryPlane(el, self, data);
-          }
-          
-          // create material
-          self.material = new THREE.MeshStandardMaterial();
-          self.material.side = THREE.DoubleSide;
-          self.material.transparent = true;
-          self.material.opacity = 1;
-
-          // create mesh
-          self.mesh = new THREE.Mesh(self.geometry, self.material);
-
-          // set mesh on entity
-          el.setObject3D('xr-plane-mesh', self.mesh);
-        }
-      });
-
+      if (
+        oldData.segmentLength !== data.segmentLength ||
+        oldData.showGraph !== data.showGraph ||
+        oldData.showLegend !== data.showLegend ||
+        oldData.showLine !== data.showLine
+      ) {
+        updateData(data, el);
+      }
     },
 
     remove: function() {
       Object.values(this.children).forEach(v => this.el.removeChild(v));
     },
 
-    createGeometryPlane: function(el, self, data) {
-      var offset = data.primaryValues[0];
-      
-      // create geometry
-      for (var j = 0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
-        // get const
-        const prim = data.primaryValues[j]-offset;
-        const sec = data.secondaryValuesBase * data.secondaryValues[j]/100;
-        const label = document.createElement('a-text');
-        const line = document.createElement('a-entity');
-        const linePath = document.createElement('a-entity');
-
-        // create vertices
-        self.geometry.vertices.push(
-          new THREE.Vector3(-sec, prim, -j*data.segmentLength),
-          new THREE.Vector3(sec, prim, -j*data.segmentLength)
-        );
-
-        // attach label line
-        el.appendChild(line);
-        line.setAttribute('line',
-          `start: ${data.secondaryValuesBase} ${prim+0.3} ${-j*data.segmentLength};
-           end: ${data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
-           color: white;
-          `
-        );
-        // attach line path
-        el.appendChild(linePath);
-        linePath.setAttribute('line',
-          `start: ${-data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
-           end: ${data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
-           color: white;
-          `
-        );
-        // attach label
-        el.appendChild(label);
-        label.setAttribute('value', data.descriptors[j]);
-        label.setAttribute('color', '#e31818');
-        label.setAttribute('position', `${data.secondaryValuesBase} ${prim+0.5} ${-j*data.segmentLength}`);
-
-        // create faces and material indices
-        if (j > 0) {
-          var step = j*2-2;
-          self.geometry.faces.push(
-            new THREE.Face3(step, step+1, step+2),
-            new THREE.Face3(step+1, step+3, step+2)
-          );
-          self.geometry.faces[step].materialIndex = step;
-          self.geometry.faces[step+1].materialIndex = step;
-        }
-      }
-    },
-
-    createGeometryLine: function(el, self, data) {
-
-    },
   });
 })();
 
