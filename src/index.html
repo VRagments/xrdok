@@ -151,23 +151,65 @@
       -->
 
       <!-- a depth forward chart with trigger buttons to simulate stages -->
-      <!--
       <a-entity
         id="graph_container"
         position="0 0 0"
       >
         <a-entity
           id="graph_content"
-          position="0 0 -2"
-          rotation="0 0 0"
-          xr-plane-graph="segmentLength: 2; src: ./models/lufttemperatur_bbb_sortiert.csv;"
-          shadow="cast: true; receive: true"
+          position="-7.5 3 -10"
+          rotation="0 -90 0"
+          scale="0.5 0.5 0.5"
+          xr-plane-graph="segmentLength: 0.5; src: ./models/lufttemperatur_bbb_sortiert.csv; showGraph: false;"
         ></a-entity>
+        <a-entity
+          id="button_exp_start"
+          scale="0.25 1 0.25"
+          rotation="90 0 0"
+          position="0 1 -2"
+          material="color: #E31818"
+          xr-button="toggle: true;"
+          xr-on__content="event: xr-button-on; id: graph_content;"
+          xr-on__button="event: xr-button-click; id: button_exp_start;"
+          xr-on__buttonnext="event: xr-button-click; id: button_start;"
+        >
+          <a-text
+            value="Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit,\nsed do eiusmod tempor\nincididunt ut labore\net dolore magna aliqua."
+            rotation="-80 90 -90"
+            align="left"
+            position="-12 0 0"
+            scale="2 2 2"
+          ></a-text>
+          <a-text
+            value="START EXPERIENCE"
+            rotation="-90 0 0"
+            align="center"
+            position="0 0.1 1.5"
+            scale="2 2 2"
+          ></a-text>
+          <a-entity
+            xr-button-icon
+            xr-icon-play
+            material="color: #888880"
+          ></a-entity>
+          <xr-comp__content
+            xr-wait="event: xr-button-on" xr-plane-graph="segmentLength: 2; src: ./models/lufttemperatur_bbb_sortiert.csv; showGraph: true;"
+            xr-wait="event: xr-button-on" animation__position="property: position; to: 0 0 0; dur: 1666"
+            xr-wait="event: xr-button-on" animation__rotation="property: rotation; to: 0 0 0; dur: 1666"
+            xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 1; dur: 1666"
+          ></xr-comp__content>
+          <xr-comp__button
+            animation__position="property: object3D.position.y; to: -50; dur: 1666"
+          ></xr-comp__button>
+          <xr-comp__buttonnext
+            animation__position="property: object3D.position.y; to: 1; dur: 1999"
+          ></xr-comp__buttonnext>
+        </a-entity>
         <a-entity
           id="button_start"
           scale="0.25 1 0.25"
           rotation="90 0 0"
-          position="0 1 -2"
+          position="0 -50 -2"
           material="color: #E31818"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
@@ -324,7 +366,6 @@
           ></xr-comp__buttonnext>
         </a-entity>
       </a-entity>
-      -->
     </a-scene>
   </body>
 </html>
