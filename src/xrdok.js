@@ -90,6 +90,53 @@ const renderstartWithRaycaster = (function() {
 
 })();
 
+const setupVRdevice = (function() {
+  let didSetup = false;
+  let result = false;
+
+  function setupHand(ent, side) {
+    ent.setAttribute('physics-collider', '');
+    ent.setAttribute('collision-filter', 'collisionForces: false');
+    ent.setAttribute('static-body', {
+      shape: 'sphere',
+      sphereRadius: '0.02'
+    });
+    ent.setAttribute('super-hands', {
+      colliderEvent: 'collisions',
+      colliderEventProperty: 'els',
+      colliderEndEvent: 'collisions',
+      colliderEndEventProperty: 'clearedEls',
+    });
+    ent.setAttribute('vive-controls', `hand: ${side}`);
+    ent.setAttribute('oculus-touch-controls', `hand: ${side}`);
+    ent.setAttribute('windows-motion-controls', `hand: ${side}`);
+  }
+
+  function runSetup(sceneEl) {
+    if (AFRAME.utils.device.checkHeadsetConnected()) {
+      const entLeft = document.createElement('a-entity');
+      const entRight = document.createElement('a-entity');
+      entLeft.setAttribute('id', 'leftHand');
+      entRight.setAttribute('id', 'rightHand');
+      setupHand(entLeft, 'left');
+      setupHand(entRight, 'right');
+      sceneEl.appendChild(entLeft);
+      sceneEl.appendChild(entRight);
+      return true;
+    }
+    return false;
+  }
+
+  return function(sceneEl, listeners) {
+    if (didSetup) {
+      return result;
+    }
+    result = runSetup(sceneEl, listeners);
+    didSetup = true;
+    return result;
+  };
+})();
+
 //
 //components
 //
@@ -137,12 +184,19 @@ const XRclick = 'xr-click';
     init: function() {
       this.el.classList.add(clazz);
       this.mousedown = mousedown.bind(this);
-      this.el.addEventListener('mousedown', this.mousedown);
-      this.el.sceneEl.addEventListener('renderstart', renderstart);
+      if (setupVRdevice(this.el.sceneEl)) {
+        // setup super hands
+        this.el.setAttribute('clickable', '');
+        this.el.addEventListener('grab-start', this.mousedown);
+      } else {
+        this.el.addEventListener('mousedown', this.mousedown);
+        this.el.sceneEl.addEventListener('renderstart', renderstart);
+      }
     },
     remove: function() {
       this.el.sceneEl.removeEventListener('renderstart', renderstart);
       this.el.removeEventListener('mousedown', this.mousedown);
+      this.el.removeEventListener('grab-start', this.mousedown);
     },
   });
 
@@ -196,20 +250,40 @@ const XRgrab = 'xr-grab';
     this.el.emit(EVTgrabend);
   }
 
+  function grabstart() {
+    this.el.emit(EVTgrabstart);
+  }
+
+  function grabend() {
+    this.el.emit(EVTgrabend);
+  }
+
+
   AFRAME.registerComponent(XRgrab, {
     schema: {},
     init: function() {
       this.el.classList.add(clazz);
-      this.mousedown = mousedown.bind(this);
-      this.mouseup = mouseup.bind(this);
-      this.el.addEventListener('mousedown', this.mousedown);
-      this.el.addEventListener('mouseup', this.mouseup);
+      if (setupVRdevice(this.el.sceneEl)) {
+        // setup super hands
+        this.el.setAttribute('grabbable', '');
+        this.grabstart = grabstart.bind(this);
+        this.grabend = grabend.bind(this);
+        this.el.addEventListener('grab-start', this.grabstart);
+        this.el.addEventListener('grab-end', this.grabend);
+      } else {
+        this.mousedown = mousedown.bind(this);
+        this.mouseup = mouseup.bind(this);
+        this.el.addEventListener('mousedown', this.mousedown);
+        this.el.addEventListener('mouseup', this.mouseup);
+      }
       this.el.sceneEl.addEventListener('renderstart', renderstart);
     },
     remove: function() {
       this.el.sceneEl.removeEventListener('renderstart', renderstart);
       this.el.removeEventListener('mouseup', this.mouseup);
       this.el.removeEventListener('mousedown', this.mousedown);
+      this.el.removeEventListener('grab-start', this.grabstart);
+      this.el.removeEventListener('grab-end', this.grabend);
     },
     tick: function() {
       if (this.proxyObject3D) {

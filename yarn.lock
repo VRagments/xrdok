@@ -39,19 +39,27 @@ acorn@^6.0.7:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.1.0.tgz#b0a3be31752c97a0f7013c5f4903b71a05db6818"
 
+aframe-extras@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/aframe-extras/-/aframe-extras-6.0.0.tgz#23e4f263acfa0f815f2aedf7202548203075712b"
+  integrity sha512-5kzNWFW9Qm47ANAf9gh7QkB60JGANt7A8ot3Axgloobdt8N+rp+OvnaNXViIihNQ04y2SV1qXICzTOjTrrzBgQ==
+  dependencies:
+    three-pathfinding "^0.7.0"
+
 aframe-physics-system@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/aframe-physics-system/-/aframe-physics-system-3.3.0.tgz#b85e2c76dd7e83694bc0371e87c8449f30ac1392"
+  integrity sha512-kNZ13/94pNLVMCbKXo8Si8ibcocuhy5UmSji8T+3qgP/MkacFlpdBYVth3IwcZBKzAq7jXRS5RbTs5PrpySmLw==
   dependencies:
     cannon "github:donmccurdy/cannon.js#v0.6.2-dev1"
     three-to-cannon "^1.3.0"
     webworkify "^1.4.0"
 
-aframe@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/aframe/-/aframe-0.9.0.tgz#da57790fe5a9d1d2cb5c7c05daaec20c34b30f35"
+aframe@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/aframe/-/aframe-0.9.1.tgz#d5913f54608ddac25581c4d3c637ea652f028b70"
+  integrity sha512-elMQ2aDzeH8s7f5F9whTd5M6YiYqSQPtsyISvZ70DIyhAkzKJh3Mx3Bwz1fqyVwgOmh/aImTGHVLy68s/BbMyw==
   dependencies:
-    animejs "^2.2.0"
     browserify-css "^0.8.4"
     custom-event-polyfill "^1.0.6"
     debug ngokevin/debug#noTimestamp
@@ -63,7 +71,8 @@ aframe@^0.9.0:
     present "0.0.6"
     promise-polyfill "^3.1.0"
     style-attr "^1.0.2"
-    super-three "^0.101.0"
+    super-animejs "^3.0.0"
+    super-three "^0.102.2"
     three-bmfont-text "^2.1.0"
     webvr-polyfill "^0.10.10"
 
@@ -83,10 +92,6 @@ amdefine@>=0.0.4:
 an-array@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/an-array/-/an-array-1.0.0.tgz#c125a5bb8257778e35f4b4f6aa9c7d0fa9e42665"
-
-animejs@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/animejs/-/animejs-2.2.0.tgz#35eefdfc535b81949c9cb06f0b3e60c02e6fdc80"
 
 ansi-escapes@^3.2.0:
   version "3.2.0"
@@ -2840,9 +2845,20 @@ style-attr@^1.0.2:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/style-attr/-/style-attr-1.3.0.tgz#2c1997a4865e25d7dbcb216be0ad715f005b9b17"
 
-super-three@^0.101.0:
-  version "0.101.0"
-  resolved "https://registry.yarnpkg.com/super-three/-/super-three-0.101.0.tgz#81b64178b7ec2220bb23715dc61f7d3f1ba7ef74"
+super-animejs@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/super-animejs/-/super-animejs-3.0.0.tgz#f784fb16dacaa6db6982df829609a13ed29cd299"
+  integrity sha512-sU+zS5zBFIfiZLswckLAiTV1wuWAm3O34sC1SfwFiHv8zVkpzGmntjwjwq6JUd34x/6vSset7gWZRmBiWkrLUA==
+
+super-hands@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/super-hands/-/super-hands-3.0.0.tgz#72a636e0db780942cf2285417a067cb2c4869d9a"
+  integrity sha512-zZl2Pk1Q3JiAuya3Ay2el5RwcxqAzR4QBe35/95atvIhU8KKt5CYPY9Zmkhz/5/UOpUOOKf+3kNQbWskiWkXTg==
+
+super-three@^0.102.2:
+  version "0.102.2"
+  resolved "https://registry.yarnpkg.com/super-three/-/super-three-0.102.2.tgz#54f6e1b9f393e849f7732b8b4ecd19f482ca19a5"
+  integrity sha512-VRFEVE1HB8mAf8tm7UL5kcqvQYrhWbzhpwswCot49hhBPJcwcjTSbIpQ824WpcKv/WyV1V6+mnl8GhT19tzTVA==
 
 supports-color@^5.3.0, supports-color@^5.5.0:
   version "5.5.0"
@@ -2892,6 +2908,11 @@ three-buffer-vertex-data@^1.0.0:
   resolved "https://registry.yarnpkg.com/three-buffer-vertex-data/-/three-buffer-vertex-data-1.1.0.tgz#cf228e78427665884b961a4cabe1f85ed39f82b1"
   dependencies:
     flatten-vertex-data "^1.0.0"
+
+three-pathfinding@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/three-pathfinding/-/three-pathfinding-0.7.0.tgz#bf64ec409bee6e7d8e19be96c7b40ebd7ef6f10d"
+  integrity sha512-UwWvzgio1UFe81n5jKHNzB4B+AG3wfZ54OKp7bTb1MHuC3cy6RTtr0dbbiPQQoqxzr+DRArR2DUwQSEknw5+nw==
 
 three-to-cannon@^1.3.0:
   version "1.4.1"
