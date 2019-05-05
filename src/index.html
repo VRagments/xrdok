@@ -157,10 +157,10 @@
       >
         <a-entity
           id="graph_content"
-          position="-7.5 3 -10"
+          position="-5 1 -10"
           rotation="0 -90 0"
-          scale="0.5 0.5 0.5"
-          xr-plane-graph="segmentLength: 0.5; src: ./models/lufttemperatur_bbb_sortiert.csv; showGraph: false;"
+          scale="1 1 0.1"
+          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false;"
         ></a-entity>
         <a-entity
           id="button_exp_start"
@@ -174,7 +174,7 @@
           xr-on__buttonnext="event: xr-button-click; id: button_start;"
         >
           <a-text
-            value="Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit,\nsed do eiusmod tempor\nincididunt ut labore\net dolore magna aliqua."
+            value="Ein Ueberblick der Jahresmitteltemperaturen\nin Berlin und Brandenburg\ndes Deutschen Wetterdienstes\nvon 1881 bis 2018."
             rotation="-80 90 -90"
             align="left"
             position="-12 0 0"
@@ -193,10 +193,10 @@
             material="color: #888880"
           ></a-entity>
           <xr-comp__content
-            xr-wait="event: xr-button-on" xr-plane-graph="segmentLength: 2; src: ./models/lufttemperatur_bbb_sortiert.csv; showGraph: true;"
-            xr-wait="event: xr-button-on" animation__position="property: position; to: 0 0 0; dur: 1666"
+            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true;"
+            xr-wait="event: xr-button-on" animation__position="property: position; to: 0 -1 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__rotation="property: rotation; to: 0 0 0; dur: 1666"
-            xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 1; dur: 1666"
+            xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 2; dur: 1666"
           ></xr-comp__content>
           <xr-comp__button
             animation__position="property: object3D.position.y; to: -50; dur: 1666"

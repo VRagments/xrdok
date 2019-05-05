@@ -751,8 +751,8 @@ const XRplanegraph = 'xr-plane-graph';
       
       legendEl.appendChild(line);
       line.setAttribute('line',
-        `start: ${sec} ${prim+0.3} ${-j*data.segmentLength};
-         end: ${sec} ${prim} ${-j*data.segmentLength};
+        `start: ${sec} ${prim+0.3} ${-j};
+         end: ${sec} ${prim} ${-j};
          color: white;
         `
       );
@@ -760,7 +760,7 @@ const XRplanegraph = 'xr-plane-graph';
       legendEl.appendChild(label);
       label.setAttribute('value', data.primaryValues[j]);
       label.setAttribute('color', '#e31818');
-      label.setAttribute('position', `${sec} ${prim+0.5} ${-j*data.segmentLength}`);
+      label.setAttribute('position', `${sec} ${prim+0.5} ${-j}`);
     }
 
     // create grid
@@ -768,7 +768,7 @@ const XRplanegraph = 'xr-plane-graph';
       const line = document.createElement('a-entity');
       line.setAttribute('line',
         `start: ${sec} ${n-offset} 0; 
-         end: ${sec} ${n-offset} -${count * data.segmentLength};
+         end: ${sec} ${n-offset} -${count};
          color: white;
         `
       );
@@ -778,10 +778,6 @@ const XRplanegraph = 'xr-plane-graph';
     legendEl.appendChild(gridEl);
 
     return legendEl;
-  }
-
-  function updateLegend(data, el) {
-    console.log('Updating legend');
   }
 
   function createGeometryLine(data) {
@@ -802,7 +798,7 @@ const XRplanegraph = 'xr-plane-graph';
 
       // create vertices
       lineGraphGeo.vertices.push(
-        new THREE.Vector3(sec, prim, -j*data.segmentLength)
+        new THREE.Vector3(sec, prim, -j)
       );
     }
     
@@ -811,10 +807,6 @@ const XRplanegraph = 'xr-plane-graph';
     lineGraphEl.setObject3D('xr-line-graph', lineGraph);
 
     return lineGraphEl;
-  }
-
-  function updateGeometryLine(data, el) {
-    console.log('Updating line');
   }
 
   function createGeometryPlane(data) {
@@ -834,8 +826,8 @@ const XRplanegraph = 'xr-plane-graph';
 
       // create vertices
       planeGraphGeo.vertices.push(
-        new THREE.Vector3(-sec, prim, -j*data.segmentLength),
-        new THREE.Vector3(sec, prim, -j*data.segmentLength)
+        new THREE.Vector3(-sec, prim, -j),
+        new THREE.Vector3(sec, prim, -j)
       );
 
       // create faces and material indices
@@ -851,8 +843,8 @@ const XRplanegraph = 'xr-plane-graph';
       // attach line path
       planeGraphEl.appendChild(linePath);
       linePath.setAttribute('line',
-        `start: ${-data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
-         end: ${data.secondaryValuesBase} ${prim} ${-j*data.segmentLength};
+        `start: ${-data.secondaryValuesBase} ${prim} ${-j};
+         end: ${data.secondaryValuesBase} ${prim} ${-j};
          color: white;
         `
       );
@@ -870,11 +862,8 @@ const XRplanegraph = 'xr-plane-graph';
     return planeGraphEl;
   }
 
-  function updateGeometryPlane(data, el) {
-    console.log('Updating plane');
-  }
-
   function createData(data, el) {
+
     // parse CSV, if available
     Papa.parse(data.src, {  // eslint-disable-line no-undef
       download: true,
@@ -884,50 +873,15 @@ const XRplanegraph = 'xr-plane-graph';
         data.secondaryValues = [];
         for (var i = 0; i < res.data.length-1; i++) {
           data.descriptors.push(res.data[i][0]);
-          data.primaryValues.push(parseFloat(res.data[i][1]/10));
+          data.primaryValues.push(parseFloat(res.data[i][1]));
           data.secondaryValues.push(parseInt(res.data[i][2]));
         }
 
-        if (data.showLine) {
-          console.log('[CREATE] appending line graph');
-          el.appendChild(createGeometryLine(data));
-        }
-        if (data.showGraph) {
-          console.log('[CREATE] appending plane graph');
-          el.appendChild(createGeometryPlane(data));
-        }
-        if (data.showLegend) {
-          console.log('[CREATE] appending legend');
-          el.appendChild(createLegend(data));
-        }
+        el.appendChild(createGeometryLine(data));
+        el.appendChild(createGeometryPlane(data));
+        el.appendChild(createLegend(data));
       }
     });
-  }
-
-  function updateData(data, el) {
-
-    // remove all former elements
-    var oldLine = document.getElementById('line-graph-parent');
-    if (oldLine != null) {
-      updateGeometryLine(oldLine, data);
-    } else {
-      console.log('appending line graph');
-      el.appendChild(createGeometryLine(data));
-    }
-    var oldPlane = document.getElementById('plane-graph-parent');
-    if (oldPlane != null) {
-      updateGeometryPlane(oldPlane, data);
-    } else {
-      console.log('appending plane graph');
-      el.appendChild(createGeometryPlane(data));
-    }
-    var oldLegend = document.getElementById('legend-parent');
-    if (oldLegend != null) {
-      updateLegend(oldLegend, data);
-    } else {
-      console.log('appending legend');
-      el.appendChild(createLegend(data));
-    }
   }
 
   AFRAME.registerComponent(XRplanegraph, {
@@ -940,8 +894,7 @@ const XRplanegraph = 'xr-plane-graph';
       primaryValues: { type: 'array', default: [] },
       primaryValuesBase: { type: 'number', default: 0},
       secondaryValues: { type: 'array', default: [] },
-      secondaryValuesBase: { type: 'number', default: 3.65 },
-      segmentLength: { type: 'number', default: 2 },
+      secondaryValuesBase: { type: 'number', default: 1 },
       showGraph: { type: 'boolean', default: true},
       showLegend: { type: 'boolean', default: true},
       showLine: { type: 'boolean', default: true},
@@ -958,15 +911,19 @@ const XRplanegraph = 'xr-plane-graph';
 
     update: function(oldData) {
       var data = this.data;
-      var el = this.el;
 
-      if (
-        oldData.segmentLength !== data.segmentLength ||
-        oldData.showGraph !== data.showGraph ||
-        oldData.showLegend !== data.showLegend ||
-        oldData.showLine !== data.showLine
-      ) {
-        updateData(data, el);
+      const line = document.getElementById('line-graph-parent');
+      const graph = document.getElementById('plane-graph-parent');
+      const legend = document.getElementById('legend-parent');
+
+      if (data.showLine !== oldData.showLine && line !== null) {
+        line.setAttribute('visible', data.showLine);
+      }
+      if (data.showGraph !== oldData.showGraph && graph !== null) {
+        graph.setAttribute('visible', data.showGraph);
+      }
+      if (data.showLegend !== oldData.showLegend && graph !== null) {
+        legend.setAttribute('visible', data.showLegend);
       }
     },
 
