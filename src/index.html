@@ -157,10 +157,10 @@
       >
         <a-entity
           id="graph_content"
-          position="-5 1 -10"
+          position="-6.85 1 -10"
           rotation="0 -90 0"
           scale="1 1 0.1"
-          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false;"
+          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false; showLegend: false; secondaryValuesBase: 3.65"
         ></a-entity>
         <a-entity
           id="button_exp_start"
@@ -193,7 +193,7 @@
             material="color: #888880"
           ></a-entity>
           <xr-comp__content
-            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true;"
+            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true; showLegend: true; secondaryValuesBase: 3.65"
             xr-wait="event: xr-button-on" animation__position="property: position; to: 0 -1 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__rotation="property: rotation; to: 0 0 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 2; dur: 1666"

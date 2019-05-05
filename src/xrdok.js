@@ -776,6 +776,7 @@ const XRplanegraph = 'xr-plane-graph';
     }
 
     legendEl.appendChild(gridEl);
+    legendEl.setAttribute('visible', data.showLegend);
 
     return legendEl;
   }
@@ -805,6 +806,7 @@ const XRplanegraph = 'xr-plane-graph';
     // create mesh
     var lineGraph = new THREE.Line(lineGraphGeo, lineGraphMat);
     lineGraphEl.setObject3D('xr-line-graph', lineGraph);
+    lineGraphEl.setAttribute('visible', data.showLine);
 
     return lineGraphEl;
   }
@@ -814,8 +816,14 @@ const XRplanegraph = 'xr-plane-graph';
     var offset = data.primaryValues[0];
     var planeGraphEl = document.createElement('a-entity');
     planeGraphEl.setAttribute('id', 'plane-graph-parent');
-    var planeGraphGeo = new THREE.Geometry();
-    var planeGraphMat = new THREE.MeshStandardMaterial();
+    var planeGraphPrimaryEl = document.createElement('a-entity');
+    planeGraphPrimaryEl.setAttribute('id', 'plane-graph-primary-parent');
+    var planeGraphSecondaryEl = document.createElement('a-entity');
+    planeGraphSecondaryEl.setAttribute('id', 'plane-graph-secondary-parent');
+    var planeGraphPrimaryGeo = new THREE.Geometry();
+    var planeGraphPrimaryMat = new THREE.MeshStandardMaterial();
+    var planeGraphSecondaryGeo = new THREE.Geometry();
+    var planeGraphSecondaryMat = new THREE.MeshStandardMaterial();
     
     // create geometry
     for (var j = 0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
@@ -824,22 +832,40 @@ const XRplanegraph = 'xr-plane-graph';
       const sec = data.secondaryValuesBase * data.secondaryValues[j]/100;
       const linePath = document.createElement('a-entity');
 
-      // create vertices
-      planeGraphGeo.vertices.push(
-        new THREE.Vector3(-sec, prim, -j),
-        new THREE.Vector3(sec, prim, -j)
+      // create primary vertices
+      planeGraphPrimaryGeo.vertices.push(
+        new THREE.Vector3(-data.secondaryValuesBase, prim, -j),
+        new THREE.Vector3(data.secondaryValuesBase, prim, -j)
       );
 
-      // create faces and material indices
+      // create secondary vertices
+      planeGraphSecondaryGeo.vertices.push(
+        new THREE.Vector3(-sec, prim + 0.001, -j),
+        new THREE.Vector3(sec, prim + 0.001, -j)
+      );
+
+      var step = j*2-2;
+
+      // create primary faces and material indices
       if (j > 0) {
-        var step = j*2-2;
-        planeGraphGeo.faces.push(
+        planeGraphPrimaryGeo.faces.push(
           new THREE.Face3(step, step+1, step+2),
           new THREE.Face3(step+1, step+3, step+2)
         );
-        planeGraphGeo.faces[step].materialIndex = step;
-        planeGraphGeo.faces[step+1].materialIndex = step;
+        planeGraphPrimaryGeo.faces[step].materialIndex = step;
+        planeGraphPrimaryGeo.faces[step+1].materialIndex = step;
       }
+
+      // create secondary faces and material indices
+      if (j > 0) {
+        planeGraphSecondaryGeo.faces.push(
+          new THREE.Face3(step, step+1, step+2),
+          new THREE.Face3(step+1, step+3, step+2)
+        );
+        planeGraphSecondaryGeo.faces[step].materialIndex = step;
+        planeGraphSecondaryGeo.faces[step+1].materialIndex = step;
+      }
+
       // attach line path
       planeGraphEl.appendChild(linePath);
       linePath.setAttribute('line',
@@ -850,15 +876,27 @@ const XRplanegraph = 'xr-plane-graph';
       );
     }
 
-    // create material
-    planeGraphMat.side = THREE.DoubleSide;
-    planeGraphMat.transparent = true;
-    planeGraphMat.opacity = 1;
+    // create primary material
+    planeGraphPrimaryMat.side = THREE.DoubleSide;
+    planeGraphPrimaryMat.transparent = true;
+    planeGraphPrimaryMat.opacity = 1;
+    planeGraphPrimaryMat.color.setHex( 0xccfccf );
 
-    // create mesh
-    var planeGraphMesh = new THREE.Mesh(planeGraphGeo, planeGraphMat);
-    planeGraphEl.setObject3D('xr-plane-graph', planeGraphMesh);
+    // create secondary material
+    planeGraphSecondaryMat.side = THREE.DoubleSide;
+    planeGraphSecondaryMat.transparent = true;
+    planeGraphSecondaryMat.opacity = 1;
 
+    // create meshes
+    var planeGraphPrimaryMesh = new THREE.Mesh(planeGraphPrimaryGeo, planeGraphPrimaryMat);
+    planeGraphPrimaryEl.setObject3D('xr-primary-plane-graph', planeGraphPrimaryMesh);
+    var planeGraphSecondaryMesh = new THREE.Mesh(planeGraphSecondaryGeo, planeGraphSecondaryMat);
+    planeGraphSecondaryEl.setObject3D('xr-secondary-plane-graph', planeGraphSecondaryMesh);
+
+    planeGraphEl.appendChild(planeGraphPrimaryEl);
+    planeGraphEl.appendChild(planeGraphSecondaryEl);
+
+    planeGraphEl.setAttribute('visible', data.showGraph);
     return planeGraphEl;
   }
 
@@ -887,9 +925,9 @@ const XRplanegraph = 'xr-plane-graph';
   AFRAME.registerComponent(XRplanegraph, {
 
     schema: {
-      color: { type: 'color', default: '#CCF'},
-      colorMax: { type: 'color', default: '#FCC'},
-      colorMin: { type: 'color', default: '#CCF'},
+      color: { type: 'color', default: '#ccfccf'},
+      colorMax: { type: 'color', default: '#fccfcc'},
+      colorMin: { type: 'color', default: '#ccfccf'},
       descriptors: {type: 'array', default: [] },
       primaryValues: { type: 'array', default: [] },
       primaryValuesBase: { type: 'number', default: 0},
@@ -916,7 +954,8 @@ const XRplanegraph = 'xr-plane-graph';
     tick: function() {
       if (this.legendEl !== null && this.activeCamera) {
         var legendEl = this.legendEl;
-        var activeCameraPosition = this.activeCamera.getAttribute('position');
+        var activeCameraPosition = new THREE.Vector3();
+        this.activeCamera.object3D.getWorldPosition(activeCameraPosition);
         for (let i =0; i < legendEl.children.length; i++){
           if (legendEl.children[i].tagName.toLowerCase() === 'a-text') {
             legendEl.children[i].object3D.lookAt(activeCameraPosition);
