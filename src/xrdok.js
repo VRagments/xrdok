@@ -787,7 +787,7 @@ const XRplanegraph = 'xr-plane-graph';
     lineGraphEl.setAttribute('id', 'line-graph-parent');
     var lineGraphGeo = new THREE.Geometry();
     var lineGraphMat = new THREE.LineBasicMaterial({
-      color: 'white',
+      color: data.color,
       linewidth: 15,
     });
     const sec = data.secondaryValuesBase;
@@ -902,25 +902,26 @@ const XRplanegraph = 'xr-plane-graph';
   }
 
   function createData(data, el) {
-
     // parse CSV, if available
-    Papa.parse(data.src, {  // eslint-disable-line no-undef
-      download: true,
-      complete: function(res) {
-        data.descriptors = [];
-        data.primaryValues = [];
-        data.secondaryValues = [];
-        for (var i = 0; i < res.data.length; i++) {
-          data.descriptors.push(res.data[i][0]);
-          data.primaryValues.push(parseFloat(res.data[i][1]));
-          data.secondaryValues.push(parseInt(res.data[i][2]));
-        }
+    if (data.src) {
+      Papa.parse(data.src, {  // eslint-disable-line no-undef
+        download: true,
+        complete: function(res) {
+          data.descriptors = [];
+          data.primaryValues = [];
+          data.secondaryValues = [];
+          for (var i = 0; i < res.data.length; i++) {
+            data.descriptors.push(res.data[i][0]);
+            data.primaryValues.push(parseFloat(res.data[i][1]));
+            data.secondaryValues.push(parseInt(res.data[i][2]));
+          }
 
-        el.appendChild(createGeometryLine(data));
-        el.appendChild(createGeometryPlane(data));
-        el.appendChild(createLegend(data));
-      }
-    });
+          el.appendChild(createGeometryLine(data));
+          el.appendChild(createGeometryPlane(data));
+          el.appendChild(createLegend(data));
+        }
+      });
+    }
   }
 
   AFRAME.registerComponent(XRplanegraph, {
