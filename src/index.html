@@ -15,12 +15,6 @@
       <a-sky color="#A5A5C5" radius="1000"></a-sky>
       <!-- ambient lighting -->
       <a-entity light="type: ambient; color: #BBB"></a-entity>
-      <!-- a spot light -->
-      <a-entity
-        light="type: spot; color: #BBB; intensity: 0.6; castShadow: true"
-        position="0 5 0"
-        rotation="-30 0 0"
-      ></a-entity>
       <!-- simulated basic ground -->
       <a-plane position="0 -10 0" rotation="-90 0 0" width="1000" height="1000" color="#656585" static-body></a-plane>
 
@@ -155,12 +149,24 @@
         id="graph_container"
         position="0 0 0"
       >
+        <a-circle
+          id="graph_sun"
+          position="0 0 -600"
+          radius="666"
+          color="#f7b32b"
+        ></a-circle>
+        <!-- a spot light -->
+        <a-entity
+          light="type: spot; color: #BBB; intensity: 0.6; angle: 90"
+          position="0 5 0"
+          rotation="-30 0 0"
+        ></a-entity>
         <a-entity
           id="graph_content"
-          position="-6.85 1 -10"
+          position="-6.85 2.5 -12"
           rotation="0 -90 0"
           scale="1 1 0.1"
-          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false; showLegend: false; secondaryValuesBase: 3.65"
+          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false; showLegend: false; secondaryValuesBase: 3.65; color: black"
         ></a-entity>
         <a-entity
           id="button_exp_start"
