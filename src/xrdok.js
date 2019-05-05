@@ -743,7 +743,7 @@ const XRplanegraph = 'xr-plane-graph';
     const minVal = Math.min(...data.primaryValues);
 
     // create geometry and elements
-    for (var j=0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+    for (var j=0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
       // attach label line
       const prim = data.primaryValues[j]-offset;
       const label = document.createElement('a-text');
@@ -793,7 +793,7 @@ const XRplanegraph = 'xr-plane-graph';
     const sec = data.secondaryValuesBase;
 
     // create geometry
-    for (var j=0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+    for (var j=0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
       //get const 
       const prim = data.primaryValues[j]-offset;
 
@@ -826,7 +826,7 @@ const XRplanegraph = 'xr-plane-graph';
     var planeGraphSecondaryMat = new THREE.MeshStandardMaterial();
     
     // create geometry
-    for (var j = 0; j < Math.min(data.descriptors.length-1, data.primaryValues.length-1); j++) {
+    for (var j = 0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
       // get const
       const prim = data.primaryValues[j]-offset;
       const sec = data.secondaryValuesBase * data.secondaryValues[j]/100;
@@ -880,12 +880,13 @@ const XRplanegraph = 'xr-plane-graph';
     planeGraphPrimaryMat.side = THREE.DoubleSide;
     planeGraphPrimaryMat.transparent = true;
     planeGraphPrimaryMat.opacity = 1;
-    planeGraphPrimaryMat.color.setHex( 0xccfccf );
+    planeGraphPrimaryMat.color.set( data.colorMin );
 
     // create secondary material
     planeGraphSecondaryMat.side = THREE.DoubleSide;
     planeGraphSecondaryMat.transparent = true;
     planeGraphSecondaryMat.opacity = 1;
+    planeGraphSecondaryMat.color.set( data.colorMax );
 
     // create meshes
     var planeGraphPrimaryMesh = new THREE.Mesh(planeGraphPrimaryGeo, planeGraphPrimaryMat);
@@ -909,7 +910,7 @@ const XRplanegraph = 'xr-plane-graph';
         data.descriptors = [];
         data.primaryValues = [];
         data.secondaryValues = [];
-        for (var i = 0; i < res.data.length-1; i++) {
+        for (var i = 0; i < res.data.length; i++) {
           data.descriptors.push(res.data[i][0]);
           data.primaryValues.push(parseFloat(res.data[i][1]));
           data.secondaryValues.push(parseInt(res.data[i][2]));
