@@ -907,23 +907,42 @@ const XRplanegraph = 'xr-plane-graph';
       var el = this.el;
 
       createData(data, el);
+
+      this.lineEl = document.getElementById('line-graph-parent');
+      this.graphEl = document.getElementById('plane-graph-parent');
+      this.legendEl = document.getElementById('legend-parent');
+    },
+
+    tick: function() {
+      if (this.legendEl !== null && this.activeCamera) {
+        var legendEl = this.legendEl;
+        var activeCameraPosition = this.activeCamera.getAttribute('position');
+        for (let i =0; i < legendEl.children.length; i++){
+          if (legendEl.children[i].tagName.toLowerCase() === 'a-text') {
+            legendEl.children[i].object3D.lookAt(activeCameraPosition);
+          }
+        }
+      } else {
+        this.activeCamera = document.querySelector('[camera]');
+        this.legendEl = document.getElementById('legend-parent');
+      }
     },
 
     update: function(oldData) {
       var data = this.data;
 
-      const line = document.getElementById('line-graph-parent');
-      const graph = document.getElementById('plane-graph-parent');
-      const legend = document.getElementById('legend-parent');
+      const lineEl = document.getElementById('line-graph-parent');
+      const graphEl = document.getElementById('plane-graph-parent');
+      const legendEl = document.getElementById('legend-parent');
 
-      if (data.showLine !== oldData.showLine && line !== null) {
-        line.setAttribute('visible', data.showLine);
+      if (data.showLine !== oldData.showLine && lineEl !== null) {
+        lineEl.setAttribute('visible', data.showLine);
       }
-      if (data.showGraph !== oldData.showGraph && graph !== null) {
-        graph.setAttribute('visible', data.showGraph);
+      if (data.showGraph !== oldData.showGraph && graphEl !== null) {
+        graphEl.setAttribute('visible', data.showGraph);
       }
-      if (data.showLegend !== oldData.showLegend && graph !== null) {
-        legend.setAttribute('visible', data.showLegend);
+      if (data.showLegend !== oldData.showLegend && legendEl !== null) {
+        legendEl.setAttribute('visible', data.showLegend);
       }
     },
 
