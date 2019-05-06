@@ -178,6 +178,7 @@
           xr-on__content="event: xr-button-on; id: graph_content;"
           xr-on__button="event: xr-button-click; id: button_exp_start;"
           xr-on__buttonnext="event: xr-button-click; id: button_start;"
+          xr-on__audio="event: xr-button-click;"
         >
           <a-text
             value="Ein Ueberblick der Jahresmitteltemperaturen\nin Berlin und Brandenburg\ndes Deutschen Wetterdienstes\nvon 1881 bis 2018."
@@ -211,6 +212,7 @@
           <xr-comp__buttonnext
             animation__position="property: object3D.position.y; to: 1; dur: 1999"
           ></xr-comp__buttonnext>
+          <xr-comp__audio sound="src: models/audio3.mp3; autoplay: true; positional: false;"></xr-comp__audio>
         </a-entity>
         <a-entity
           id="button_start"
@@ -222,9 +224,10 @@
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_start;"
           xr-on__buttonnext="event: xr-button-click; id: button_next_1;"
+          xr-on__audio="event: xr-button-click;"
         >
           <a-text
-            value="Der erste Teil der Reise auf dem Datengraphen fuehrt von 1881 ins Jahr 1934."
+            value="Links des Graphen sind die Jahreszahlen angezeigt, auf der rechten Seite die Temperaturen in Grad Celsius."
             rotation="-90 0 0"
             align="center"
             position="0 0 -4"
@@ -253,6 +256,7 @@
           <xr-comp__buttonnext
             animation__position="property: object3D.position.y; to: 2; dur: 6999"
           ></xr-comp__buttonnext>
+          <xr-comp__audio sound="src: models/audio1.mp3; autoplay: true; positional: false;"></xr-comp__audio>
         </a-entity>
         <a-entity
           id="button_next_1"
@@ -264,6 +268,7 @@
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_1;"
           xr-on__buttonnext="event: xr-button-click; id: button_next_2;"
+          xr-on__audio="event: xr-button-click;"
         >
           <a-text
             value="1934 zaehlt zu den vier heissesten Jahren vor der Jahrhundertwende. Hier betrug die Jahresmitteltemperatur 10,5 Grad Celsius."
@@ -294,6 +299,7 @@
           <xr-comp__buttonnext
             animation__position="property: object3D.position.y; to: 2; dur: 3999"
           ></xr-comp__buttonnext>
+          <xr-comp__audio sound="src: models/audio5.mp3; autoplay: true; positional: false;"></xr-comp__audio>
         </a-entity>
         <a-entity
           id="button_next_2"
@@ -305,6 +311,7 @@
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_2;"
           xr-on__buttonnext="event: xr-button-click; id: button_next_3;"
+          xr-on__audio="event: xr-button-click;"
         >
           <a-text
             value="1940 war das kaelteste Jahr zwischen 1881 und 2018. Die Jahresmitteltemperatur betrug nur 6,7 Grad Celsius."
@@ -336,6 +343,7 @@
           <xr-comp__buttonnext
             animation__position="property: object3D.position.y; to: 2.5; dur: 6999"
           ></xr-comp__buttonnext>
+          <xr-comp__audio sound="src: models/audio2.mp3; autoplay: true; positional: false;"></xr-comp__audio>
         </a-entity>
         <a-entity
           id="button_next_3"
@@ -347,6 +355,7 @@
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_3;"
           xr-on__buttonnext="event: xr-button-click; id: button_next_4;"
+          xr-on__audio="event: xr-button-click;"
         >
           <a-text
             value="2014 zaehlt mit 10,7 Grad Celsius Jahresmitteltemperatur zu den heissesten Jahren seit 1881. Auch 2000, 2007,2008 und 2015 zaehlen dazu."
@@ -377,6 +386,7 @@
           <xr-comp__buttonnext
             animation__position="property: object3D.position.y; to: 2.5; dur: 1999"
           ></xr-comp__buttonnext>
+          <xr-comp__audio sound="src: models/audio4.mp3; autoplay: true; positional: false;"></xr-comp__audio>
         </a-entity>
         <a-entity
           id="button_next_4"
