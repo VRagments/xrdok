@@ -840,7 +840,7 @@ const XRplanegraph = 'xr-plane-graph';
     for (var j = 0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
       // get const
       const prim = data.primaryValues[j]-offset;
-      const sec = data.secondaryValuesBase * data.secondaryValues[j]/100;
+      const sec = (data.secondaryValuesBase * data.secondaryValues[j]/data.secondaryValuesBase)/100;
       const linePath = document.createElement('a-entity');
 
       // create primary vertices
