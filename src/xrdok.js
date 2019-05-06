@@ -732,6 +732,25 @@ const XRiconchevron = 'xr-icon-chevron';
 const XRplanegraph = 'xr-plane-graph';
 (function () {
 
+  function createVerticalLine(x, y, z, height, color) {
+    const line = document.createElement('a-entity');
+    line.setAttribute('line',
+      `start: ${x} ${y + height} ${-z};
+       end: ${x} ${y} ${-z};
+       color: ${color};
+      `
+    );
+    return line;
+  }
+
+  function createLabel(x, y, z, height, value, color) {
+    const label = document.createElement('a-text');
+    label.setAttribute('value', value);
+    label.setAttribute('color', color);
+    label.setAttribute('position', `${x} ${y + height} ${-z}`);
+    return label;
+  }
+
   function createLegend(data) {
     var offset = data.primaryValues[0];
     var legendEl = document.createElement('a-entity');
@@ -746,21 +765,13 @@ const XRplanegraph = 'xr-plane-graph';
     for (var j=0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
       // attach label line
       const prim = data.primaryValues[j]-offset;
-      const label = document.createElement('a-text');
-      const line = document.createElement('a-entity');
-      
-      legendEl.appendChild(line);
-      line.setAttribute('line',
-        `start: ${sec} ${prim+0.3} ${-j};
-         end: ${sec} ${prim} ${-j};
-         color: white;
-        `
-      );
-      // attach label
-      legendEl.appendChild(label);
-      label.setAttribute('value', data.primaryValues[j]);
-      label.setAttribute('color', '#e31818');
-      label.setAttribute('position', `${sec} ${prim+0.5} ${-j}`);
+
+      // attach lines
+      legendEl.appendChild(createVerticalLine(sec, prim, j, 0.6, data.color));
+      legendEl.appendChild(createVerticalLine(-sec, prim, j, 0.6, data.color));
+      // attach labels
+      legendEl.appendChild(createLabel(sec, prim, j, 0.8, data.primaryValues[j], data.color));
+      legendEl.appendChild(createLabel(-sec, prim, j, 0.8, data.descriptors[j], data.color));
     }
 
     // create grid
