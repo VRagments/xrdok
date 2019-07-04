@@ -21,6 +21,45 @@ const eventNames = [
 ];
 
 //
+// shaders
+//
+
+const yGradientVertexShader = `
+uniform vec3 bboxMin;
+uniform vec3 bboxMax;
+
+varying vec2 vUv;
+
+void main() {
+  vUv.y = (position.y - bboxMin.y) / (bboxMax.y - bboxMin.y);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+}
+`;
+
+const yGradientFragmentShader = `
+uniform vec3 color1;
+uniform vec3 color2;
+uniform vec3 color3;
+uniform float neutral;
+
+vec4 minColor = vec4(color1.x, color1.y, color1.z, 1.0);
+vec4 medColor = vec4(color2.x, color2.y, color2.z, 1.0);
+vec4 maxColor = vec4(color3.x, color3.y, color3.z, 1.0);
+
+float step1 = 0.0;
+float step3 = 1.0;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 color = mix(minColor, medColor, smoothstep(step1, neutral, vUv.y));
+  color = mix(color, maxColor, smoothstep(neutral, step3, vUv.y));
+
+  gl_FragColor = color;
+}
+`;
+
+//
 // helpers
 //
 
@@ -752,48 +791,48 @@ const XRplanegraph = 'xr-plane-graph';
   }
 
   function createLegend(data) {
-    var offset = data.primaryValues[0];
+    var offset = data.values[0];
     var legendEl = document.createElement('a-entity');
     legendEl.setAttribute('id', 'legend-parent');
-    const sec = data.secondaryValuesBase;
+    const sec = data.graphWidth;
     var gridEl = document.createElement('a-entity');
-    const count = data.primaryValues.length;
-    const maxVal = Math.max(...data.primaryValues);
-    const minVal = Math.min(...data.primaryValues);
+    const count = data.values.length;
+    const maxVal = Math.max(...data.values);
+    const minVal = Math.min(...data.values);
 
     // create geometry and elements
-    for (var j=0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
+    for (var j=0; j < Math.min(data.descriptors.length, data.values.length); j++) {
       // attach label line
-      const prim = data.primaryValues[j]-offset;
+      const prim = data.values[j]-offset;
 
       // attach lines
-      legendEl.appendChild(createVerticalLine(sec, prim, j, 0.6, data.color));
-      legendEl.appendChild(createVerticalLine(-sec, prim, j, 0.6, data.color));
+      legendEl.appendChild(createVerticalLine(sec*2, prim, j, 0.6, 'white'));
+      legendEl.appendChild(createVerticalLine(-sec*2, prim, j, 0.6, 'white'));
       // attach labels
-      legendEl.appendChild(createLabel(sec, prim, j, 0.8, data.primaryValues[j], data.color));
-      legendEl.appendChild(createLabel(-sec, prim, j, 0.8, data.descriptors[j], data.color));
+      legendEl.appendChild(createLabel(sec*2, prim, j, 0.8, data.values[j], 'white'));
+      legendEl.appendChild(createLabel(-sec*2, prim, j, 0.8, data.descriptors[j], 'white'));
     }
 
     // create grid
     for (var n = Math.floor(minVal); n <= Math.ceil(maxVal); n++) {
       const line = document.createElement('a-entity');
       line.setAttribute('line',
-        `start: ${sec} ${n-offset} 0; 
-         end: ${sec} ${n-offset} -${count};
+        `start: ${sec*2} ${n-offset} 0; 
+         end: ${sec*2} ${n-offset} -${count};
          color: white;
         `
       );
       gridEl.appendChild(line);
     }
 
-    legendEl.appendChild(gridEl);
+    // legendEl.appendChild(gridEl);
     legendEl.setAttribute('visible', data.showLegend);
 
     return legendEl;
   }
 
   function createGeometryLine(data) {
-    var offset = data.primaryValues[0];
+    var offset = data.values[0];
     var lineGraphEl = document.createElement('a-entity');
     lineGraphEl.setAttribute('id', 'line-graph-parent');
     var lineGraphGeo = new THREE.Geometry();
@@ -801,16 +840,15 @@ const XRplanegraph = 'xr-plane-graph';
       color: data.color,
       linewidth: 15,
     });
-    const sec = data.secondaryValuesBase;
 
     // create geometry
-    for (var j=0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
+    for (var j=0; j < Math.min(data.descriptors.length, data.values.length); j++) {
       //get const 
-      const prim = data.primaryValues[j]-offset;
+      const prim = data.values[j]-offset;
 
       // create vertices
       lineGraphGeo.vertices.push(
-        new THREE.Vector3(sec, prim, -j)
+        new THREE.Vector3(data.graphWidth*2, prim, -j)
       );
     }
     
@@ -824,89 +862,77 @@ const XRplanegraph = 'xr-plane-graph';
 
   function createGeometryPlane(data) {
 
-    var offset = data.primaryValues[0];
+    var offset = data.values[0];
     var planeGraphEl = document.createElement('a-entity');
     planeGraphEl.setAttribute('id', 'plane-graph-parent');
-    var planeGraphPrimaryEl = document.createElement('a-entity');
-    planeGraphPrimaryEl.setAttribute('id', 'plane-graph-primary-parent');
-    var planeGraphSecondaryEl = document.createElement('a-entity');
-    planeGraphSecondaryEl.setAttribute('id', 'plane-graph-secondary-parent');
-    var planeGraphPrimaryGeo = new THREE.Geometry();
-    var planeGraphPrimaryMat = new THREE.MeshStandardMaterial();
-    var planeGraphSecondaryGeo = new THREE.Geometry();
-    var planeGraphSecondaryMat = new THREE.MeshStandardMaterial();
+    var planeGraphGeo = new THREE.Geometry();
     
     // create geometry
-    for (var j = 0; j < Math.min(data.descriptors.length, data.primaryValues.length); j++) {
+    for (var j = 0; j < Math.min(data.descriptors.length, data.values.length); j++) {
       // get const
-      const prim = data.primaryValues[j]-offset;
-      const sec = (data.secondaryValuesBase * data.secondaryValues[j]/data.secondaryValuesBase)/100;
+      const prim = data.values[j]-offset;
       const linePath = document.createElement('a-entity');
 
       // create primary vertices
-      planeGraphPrimaryGeo.vertices.push(
-        new THREE.Vector3(-data.secondaryValuesBase, prim, -j),
-        new THREE.Vector3(data.secondaryValuesBase, prim, -j)
-      );
-
-      // create secondary vertices
-      planeGraphSecondaryGeo.vertices.push(
-        new THREE.Vector3(-sec, prim + 0.001, -j),
-        new THREE.Vector3(sec, prim + 0.001, -j)
+      planeGraphGeo.vertices.push(
+        new THREE.Vector3(-data.graphWidth, prim, -j),
+        new THREE.Vector3(data.graphWidth, prim, -j)
       );
 
       var step = j*2-2;
 
-      // create primary faces and material indices
+      // create faces and material indices
       if (j > 0) {
-        planeGraphPrimaryGeo.faces.push(
+        planeGraphGeo.faces.push(
           new THREE.Face3(step, step+1, step+2),
           new THREE.Face3(step+1, step+3, step+2)
         );
-        planeGraphPrimaryGeo.faces[step].materialIndex = step;
-        planeGraphPrimaryGeo.faces[step+1].materialIndex = step;
+        planeGraphGeo.faces[step].materialIndex = step;
+        planeGraphGeo.faces[step+1].materialIndex = step;
       }
 
-      // create secondary faces and material indices
-      if (j > 0) {
-        planeGraphSecondaryGeo.faces.push(
-          new THREE.Face3(step, step+1, step+2),
-          new THREE.Face3(step+1, step+3, step+2)
-        );
-        planeGraphSecondaryGeo.faces[step].materialIndex = step;
-        planeGraphSecondaryGeo.faces[step+1].materialIndex = step;
-      }
-
-      // attach line path
+      // attach outside line path 
       planeGraphEl.appendChild(linePath);
       linePath.setAttribute('line',
-        `start: ${-data.secondaryValuesBase} ${prim} ${-j};
-         end: ${data.secondaryValuesBase} ${prim} ${-j};
-         color: white;
+        `start: ${-data.graphWidth*2} ${prim} ${-j};
+         end: ${data.graphWidth*2} ${prim} ${-j};
+         color: data.color;
         `
       );
     }
 
-    // create primary material
-    planeGraphPrimaryMat.side = THREE.DoubleSide;
-    planeGraphPrimaryMat.transparent = true;
-    planeGraphPrimaryMat.opacity = 1;
-    planeGraphPrimaryMat.color.set( data.colorMin );
+    planeGraphGeo.computeBoundingBox();
 
-    // create secondary material
-    planeGraphSecondaryMat.side = THREE.DoubleSide;
-    planeGraphSecondaryMat.transparent = true;
-    planeGraphSecondaryMat.opacity = 1;
-    planeGraphSecondaryMat.color.set( data.colorMax );
+    // create material
+    var planeGraphMat = new THREE.ShaderMaterial({
+      uniforms: {
+        color1: {
+          value: new THREE.Color(data.colorMin)
+        },
+        color2: {
+          value: new THREE.Color('white')
+        },
+        color3: {
+          value: new THREE.Color(data.colorMax)
+        },
+        bboxMin: {
+          value: planeGraphGeo.boundingBox.min
+        },
+        bboxMax: {
+          value: planeGraphGeo.boundingBox.max
+        },
+        neutral: {
+          value: 0.5
+        }
+      },
+      vertexShader: yGradientVertexShader,
+      fragmentShader: yGradientFragmentShader
+    });
+    planeGraphMat.side = THREE.DoubleSide;
 
     // create meshes
-    var planeGraphPrimaryMesh = new THREE.Mesh(planeGraphPrimaryGeo, planeGraphPrimaryMat);
-    planeGraphPrimaryEl.setObject3D('xr-primary-plane-graph', planeGraphPrimaryMesh);
-    var planeGraphSecondaryMesh = new THREE.Mesh(planeGraphSecondaryGeo, planeGraphSecondaryMat);
-    planeGraphSecondaryEl.setObject3D('xr-secondary-plane-graph', planeGraphSecondaryMesh);
-
-    planeGraphEl.appendChild(planeGraphPrimaryEl);
-    planeGraphEl.appendChild(planeGraphSecondaryEl);
+    var planeGraphMesh = new THREE.Mesh(planeGraphGeo, planeGraphMat);
+    planeGraphEl.setObject3D('xr-plane-graph', planeGraphMesh);
 
     planeGraphEl.setAttribute('visible', data.showGraph);
     return planeGraphEl;
@@ -919,12 +945,10 @@ const XRplanegraph = 'xr-plane-graph';
         download: true,
         complete: function(res) {
           data.descriptors = [];
-          data.primaryValues = [];
-          data.secondaryValues = [];
+          data.values = [];
           for (var i = 0; i < res.data.length; i++) {
             data.descriptors.push(res.data[i][0]);
-            data.primaryValues.push(parseFloat(res.data[i][1]));
-            data.secondaryValues.push(parseInt(res.data[i][2]));
+            data.values.push(parseFloat(res.data[i][1]));
           }
 
           el.appendChild(createGeometryLine(data));
@@ -938,14 +962,13 @@ const XRplanegraph = 'xr-plane-graph';
   AFRAME.registerComponent(XRplanegraph, {
 
     schema: {
-      color: { type: 'color', default: '#ccfccf'},
-      colorMax: { type: 'color', default: '#fccfcc'},
-      colorMin: { type: 'color', default: '#ccfccf'},
+      color: { type: 'color', default: '#ffffff'},
+      colorMax: { type: 'color', default: '#ff0000'},
+      colorMin: { type: 'color', default: '#0000ff'},
       descriptors: {type: 'array', default: [] },
-      primaryValues: { type: 'array', default: [] },
-      primaryValuesBase: { type: 'number', default: 0},
-      secondaryValues: { type: 'array', default: [] },
-      secondaryValuesBase: { type: 'number', default: 1 },
+      graphWidth: {type: 'number', default: 2},
+      values: { type: 'array', default: [] },
+      valuesBase: { type: 'number', default: 0},
       showGraph: { type: 'boolean', default: true},
       showLegend: { type: 'boolean', default: true},
       showLine: { type: 'boolean', default: true},

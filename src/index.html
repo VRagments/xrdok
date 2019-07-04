@@ -16,7 +16,7 @@
       <!-- ambient lighting -->
       <a-entity light="type: ambient; color: #BBB"></a-entity>
       <!-- simulated basic ground -->
-      <a-plane position="0 -10 0" rotation="-90 0 0" width="1000" height="1000" color="#656585" static-body></a-plane>
+      <a-plane position="0 -10 0" rotation="-90 0 0" width="1000" height="1000" color="#B5B5B5" static-body></a-plane>
 
       <!-- camera in fly mode and with faster movement -->
       <!--
@@ -166,14 +166,14 @@
           position="-6.85 2.5 -12"
           rotation="0 -90 0"
           scale="1 1 0.1"
-          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false; showLegend: false; secondaryValuesBase: 3.65; color: #e21818"
+          xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: false; showLegend: false; color: #e21818"
         ></a-entity>
         <a-entity
           id="button_exp_start"
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 1 -2"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button="toggle: true;"
           xr-on__content="event: xr-button-on; id: graph_content;"
           xr-on__button="event: xr-button-click; id: button_exp_start;"
@@ -186,7 +186,7 @@
             align="left"
             position="-12 0 0"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="START EXPERIENCE"
@@ -194,17 +194,18 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
             xr-icon-play
-            material="color: #888880"
+            material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
-            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true; showLegend: true; secondaryValuesBase: 3.65"
+            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true; showLegend: true; colorMin: #0000FF; colorMax: #FF0000; graphWidth: 4"
             xr-wait="event: xr-button-on" animation__position="property: position; to: 0 -1 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__rotation="property: rotation; to: 0 0 0; dur: 1666"
-            xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 3 2; dur: 1666"
+            xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 2; dur: 1666"
           ></xr-comp__content>
           <xr-comp__button
             animation__position="property: object3D.position.y; to: -50; dur: 1666"
@@ -219,7 +220,7 @@
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 -50 -2"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_start;"
@@ -232,7 +233,7 @@
             align="center"
             position="0 0 -4"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="START"
@@ -240,11 +241,12 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
             xr-icon-play
-            material="color: #888880"
+            material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
             animation__positionx="property: object3D.position.z; to: 106; dur: 6666"
@@ -263,7 +265,7 @@
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 -50 -108"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_1;"
@@ -276,7 +278,7 @@
             align="center"
             position="0 0 -4"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="WEITER"
@@ -284,11 +286,12 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
             xr-icon-play
-            material="color: #888880"
+            material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
             animation__position="property: object3D.position.z; to: 118; dur: 2666"
@@ -306,7 +309,7 @@
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 -50 -120"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_2;"
@@ -319,7 +322,7 @@
             align="center"
             position="0 0 -4"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="WEITER"
@@ -327,6 +330,7 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
@@ -350,7 +354,7 @@
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 -50 -268"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_3;"
@@ -363,7 +367,7 @@
             align="center"
             position="0 0 -4"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="WEITER"
@@ -371,11 +375,12 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
             xr-icon-play
-            material="color: #888880"
+            material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
             animation__position="property: object3D.position.z; to: 274; dur: 1666"
@@ -393,7 +398,7 @@
           scale="0.25 1 0.25"
           rotation="90 0 0"
           position="0 -50 -276"
-          material="color: #E31818"
+          material="color: #333333"
           xr-button
           xr-on__content="event: xr-button-click; id: graph_container;"
           xr-on__button="event: xr-button-click; id: button_next_4;"
@@ -405,7 +410,7 @@
             align="center"
             position="0 0 -4"
             scale="2 2 2"
-            color="#E31818"
+            color="#000000"
           ></a-text>
           <a-text
             value="ZUM ANFANG"
@@ -413,11 +418,12 @@
             align="center"
             position="0 0.1 1.5"
             scale="2 2 2"
+            color="#000000"
           ></a-text>
           <a-entity
             xr-button-icon
             xr-icon-play
-            material="color: #888880"
+            material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
             animation__positionz="property: object3D.position.z; to: 0; dur: 1666"
