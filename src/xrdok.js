@@ -40,22 +40,32 @@ const yGradientFragmentShader = `
 uniform vec3 color1;
 uniform vec3 color2;
 uniform vec3 color3;
-uniform float neutral;
-
-vec4 minColor = vec4(color1.x, color1.y, color1.z, 1.0);
-vec4 medColor = vec4(color2.x, color2.y, color2.z, 1.0);
-vec4 maxColor = vec4(color3.x, color3.y, color3.z, 1.0);
-
-float step1 = 0.0;
-float step3 = 1.0;
 
 varying vec2 vUv;
 
 void main() {
-  vec4 color = mix(minColor, medColor, smoothstep(step1, neutral, vUv.y));
-  color = mix(color, maxColor, smoothstep(neutral, step3, vUv.y));
+  
+  vec4 minColor = vec4(color1.x, color1.y, color1.z, 1.0);
+  vec4 medColor = vec4(color2.x, color2.y, color2.z, 1.0);
+  vec4 maxColor = vec4(color3.x, color3.y, color3.z, 1.0);
 
-  gl_FragColor = color;
+  const float gradientSteps = 20.0;
+
+	vec4 color;
+
+	for (float i = 0.0; i < gradientSteps; i += 1.0) {
+		vec4 tmpColor;
+		if (i < gradientSteps / 2.0) {
+			tmpColor = mix(minColor, medColor, i * 2.0 / gradientSteps);
+		} else if (i > gradientSteps / 2.0) {
+			tmpColor = mix(medColor, maxColor, ((i + 1.0) - gradientSteps / 2.0) * 2.0 / gradientSteps);
+		} else {
+			tmpColor = medColor;
+		}
+		color = mix(color, tmpColor, step(i / gradientSteps, vUv.y));
+	}
+
+	gl_FragColor = color;
 }
 `;
 
@@ -875,17 +885,21 @@ const XRplanegraph = 'xr-plane-graph';
 
       // create primary vertices
       planeGraphGeo.vertices.push(
-        new THREE.Vector3(-data.graphWidth, prim, -j),
-        new THREE.Vector3(data.graphWidth, prim, -j)
+        new THREE.Vector3(-data.graphWidth, prim, -j+0.3),
+        new THREE.Vector3(data.graphWidth, prim, -j+0.3),
+        new THREE.Vector3(-data.graphWidth, prim, -j-0.3),
+        new THREE.Vector3(data.graphWidth, prim, -j-0.3)
       );
 
-      var step = j*2-2;
+      var step = j*4-4;
 
       // create faces and material indices
       if (j > 0) {
         planeGraphGeo.faces.push(
           new THREE.Face3(step, step+1, step+2),
-          new THREE.Face3(step+1, step+3, step+2)
+          new THREE.Face3(step+1, step+3, step+2),
+          new THREE.Face3(step+2, step+3, step+4),
+          new THREE.Face3(step+3, step+5, step+4)
         );
         planeGraphGeo.faces[step].materialIndex = step;
         planeGraphGeo.faces[step+1].materialIndex = step;
@@ -910,7 +924,7 @@ const XRplanegraph = 'xr-plane-graph';
           value: new THREE.Color(data.colorMin)
         },
         color2: {
-          value: new THREE.Color('white')
+          value: new THREE.Color(data.colorNeutral)
         },
         color3: {
           value: new THREE.Color(data.colorMax)
@@ -921,8 +935,8 @@ const XRplanegraph = 'xr-plane-graph';
         bboxMax: {
           value: planeGraphGeo.boundingBox.max
         },
-        neutral: {
-          value: 0.5
+        gradSteps: {
+          value: 20 // set to 0 to apply smoothstep
         }
       },
       vertexShader: yGradientVertexShader,
@@ -962,9 +976,10 @@ const XRplanegraph = 'xr-plane-graph';
   AFRAME.registerComponent(XRplanegraph, {
 
     schema: {
-      color: { type: 'color', default: '#ffffff'},
-      colorMax: { type: 'color', default: '#ff0000'},
-      colorMin: { type: 'color', default: '#0000ff'},
+      color: { type: 'color', default: '#FFFFFF'},
+      colorMax: { type: 'color', default: '#67001F'},
+      colorMin: { type: 'color', default: '#053061'},
+      colorNeutral: { type: 'color', default: '#F7F7F7'},
       descriptors: {type: 'array', default: [] },
       graphWidth: {type: 'number', default: 2},
       values: { type: 'array', default: [] },

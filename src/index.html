@@ -8,6 +8,8 @@
     <script src="aframe-physics-system.js"></script>
     <script src="papaparse.min.js"></script>
     <script src="xrdok.js"></script>
+    <!-- other useful 3rd party libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.4/chroma.min.js"></script>
   </head>
   <body>
     <a-scene>
@@ -202,7 +204,7 @@
             material="color: #FFFFFF"
           ></a-entity>
           <xr-comp__content
-            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true; showLegend: true; colorMin: #0000FF; colorMax: #FF0000; graphWidth: 4"
+            xr-wait="event: xr-button-on" xr-plane-graph="src: ./models/mean_air_temp_bb.csv; showGraph: true; showLegend: true; showLine: false; color: #FFFFFF; colorMin: #053061; colorMax: #67001F; graphWidth: 4"
             xr-wait="event: xr-button-on" animation__position="property: position; to: 0 -1 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__rotation="property: rotation; to: 0 0 0; dur: 1666"
             xr-wait="event: xr-button-on" animation__scale="property: scale; to: 1 1 2; dur: 1666"
