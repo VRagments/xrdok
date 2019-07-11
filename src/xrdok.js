@@ -781,6 +781,21 @@ const XRiconchevron = 'xr-icon-chevron';
 const XRplanegraph = 'xr-plane-graph';
 (function () {
 
+  function calculateXYearAvg(values, years) { // eslint-disable-line no-unused-vars
+    var entries = values.length;
+    var returnArray = [];
+    
+    if (entries >= years) {
+      for (var i = years; i < entries; i++) {
+        var rangeYears = values.slice(i-years,i);
+        const sum = rangeYears.reduce((a,b) => a += b);
+        const avg = sum/years;
+        returnArray.push(avg.toFixed(2));
+      }
+    }
+    return returnArray;
+  }
+
   function createVerticalLine(x, y, z, height, color) {
     const line = document.createElement('a-entity');
     line.setAttribute('line',
@@ -964,6 +979,12 @@ const XRplanegraph = 'xr-plane-graph';
             data.descriptors.push(res.data[i][0]);
             data.values.push(parseFloat(res.data[i][1]));
           }
+
+          /*
+          var avg30 = calculateXYearAvg(data.values, 30);
+          data.values = avg30;
+          data.descriptors = data.descriptors.slice(30,data.descriptors.length);
+          */
 
           el.appendChild(createGeometryLine(data));
           el.appendChild(createGeometryPlane(data));
