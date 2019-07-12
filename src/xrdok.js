@@ -925,7 +925,7 @@ const XRplanegraph = 'xr-plane-graph';
       linePath.setAttribute('line',
         `start: ${-data.graphWidth*2} ${prim} ${-j};
          end: ${data.graphWidth*2} ${prim} ${-j};
-         color: data.color;
+         color: ${data.color};
         `
       );
     }
