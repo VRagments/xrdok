@@ -796,6 +796,35 @@ const XRplanegraph = 'xr-plane-graph';
     return returnArray;
   }
 
+  function createGradientShader(geo, data) {
+    geo.computeBoundingBox();
+    var shaderMat = new THREE.ShaderMaterial({
+      uniforms: {
+        color1: {
+          value: new THREE.Color(data.colorMin)
+        },
+        color2: {
+          value: new THREE.Color(data.colorNeutral)
+        },
+        color3: {
+          value: new THREE.Color(data.colorMax)
+        },
+        bboxMin: {
+          value: geo.boundingBox.min
+        },
+        bboxMax: {
+          value: geo.boundingBox.max
+        },
+        gradSteps: {
+          value: data.gradSteps // set to 0 to apply smoothstep
+        }
+      },
+      vertexShader: yGradientVertexShader,
+      fragmentShader: yGradientFragmentShader
+    });
+    return shaderMat;
+  }
+
   function createVerticalLine(x, y, z, height, color) {
     const line = document.createElement('a-entity');
     line.setAttribute('line',
@@ -834,8 +863,8 @@ const XRplanegraph = 'xr-plane-graph';
       legendEl.appendChild(createVerticalLine(sec*2, prim, j, 0.6, 'white'));
       legendEl.appendChild(createVerticalLine(-sec*2, prim, j, 0.6, 'white'));
       // attach labels
-      legendEl.appendChild(createLabel(sec*2, prim, j, 0.8, data.values[j], 'white'));
-      legendEl.appendChild(createLabel(-sec*2, prim, j, 0.8, data.descriptors[j], 'white'));
+      legendEl.appendChild(createLabel(sec*2, prim, j, 0.8, data.values[j], 'black'));
+      legendEl.appendChild(createLabel(-sec*2, prim, j, 0.8, data.descriptors[j], 'black'));
     }
 
     // create grid
@@ -888,12 +917,13 @@ const XRplanegraph = 'xr-plane-graph';
   function createGeometryPlane(data) {
 
     var offset = data.values[0];
+    var dataLength = Math.min(data.descriptors.length, data.values.length);
     var planeGraphEl = document.createElement('a-entity');
     planeGraphEl.setAttribute('id', 'plane-graph-parent');
     var planeGraphGeo = new THREE.Geometry();
     
     // create geometry
-    for (var j = 0; j < Math.min(data.descriptors.length, data.values.length); j++) {
+    for (var j = 0; j < dataLength; j++) {
       // get const
       const prim = data.values[j]-offset;
       const linePath = document.createElement('a-entity');
@@ -906,7 +936,7 @@ const XRplanegraph = 'xr-plane-graph';
         new THREE.Vector3(data.graphWidth, prim, -j-0.3)
       );
 
-      var step = j*4-4;
+      var step = j*4-2;
 
       // create faces and material indices
       if (j > 0) {
@@ -918,6 +948,11 @@ const XRplanegraph = 'xr-plane-graph';
         );
         planeGraphGeo.faces[step].materialIndex = step;
         planeGraphGeo.faces[step+1].materialIndex = step;
+      } else {
+        planeGraphGeo.faces.push(
+          new THREE.Face3(0, 1, 2),
+          new THREE.Face3(1, 3, 2)
+        );
       }
 
       // attach outside line path 
@@ -925,7 +960,7 @@ const XRplanegraph = 'xr-plane-graph';
       linePath.setAttribute('line',
         `start: ${-data.graphWidth*2} ${prim} ${-j};
          end: ${data.graphWidth*2} ${prim} ${-j};
-         color: ${data.color};
+         color: white;
         `
       );
     }
@@ -933,30 +968,7 @@ const XRplanegraph = 'xr-plane-graph';
     planeGraphGeo.computeBoundingBox();
 
     // create material
-    var planeGraphMat = new THREE.ShaderMaterial({
-      uniforms: {
-        color1: {
-          value: new THREE.Color(data.colorMin)
-        },
-        color2: {
-          value: new THREE.Color(data.colorNeutral)
-        },
-        color3: {
-          value: new THREE.Color(data.colorMax)
-        },
-        bboxMin: {
-          value: planeGraphGeo.boundingBox.min
-        },
-        bboxMax: {
-          value: planeGraphGeo.boundingBox.max
-        },
-        gradSteps: {
-          value: 20 // set to 0 to apply smoothstep
-        }
-      },
-      vertexShader: yGradientVertexShader,
-      fragmentShader: yGradientFragmentShader
-    });
+    var planeGraphMat = createGradientShader(planeGraphGeo, data);
     planeGraphMat.side = THREE.DoubleSide;
 
     // create meshes
@@ -985,7 +997,7 @@ const XRplanegraph = 'xr-plane-graph';
           data.values = avg30;
           data.descriptors = data.descriptors.slice(30,data.descriptors.length);
           */
-
+          
           el.appendChild(createGeometryLine(data));
           el.appendChild(createGeometryPlane(data));
           el.appendChild(createLegend(data));
