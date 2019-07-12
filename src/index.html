@@ -19,7 +19,10 @@
       <a-plane position="0 -10 0" rotation="-90 0 0" width="1000" height="1000" color="#B5B5B5" static-body></a-plane>
 
       <!-- camera in fly mode and with faster movement -->
-      <a-entity position="0 1.6 0" camera wasd-controls="fly: true; acceleration: 200.00;" look-controls></a-entity>
+      <!--
+        <a-entity position="0 1.6 0" camera wasd-controls="fly: true; acceleration: 200.00;" look-controls></a-entity>
+      -->
+      <a-entity position="0 1.6 0" camera look-controls="reverseMouseDrag: true, reverseTouchDrag: true"></a-entity>
 
       <!-- a box showing the output that xr-inspect prints -->
       <!--
