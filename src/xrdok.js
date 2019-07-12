@@ -892,7 +892,7 @@ const XRplanegraph = 'xr-plane-graph';
     var lineGraphGeo = new THREE.Geometry();
     var lineGraphMat = new THREE.LineBasicMaterial({
       color: data.color,
-      linewidth: 15,
+      linewidth: 2,
     });
 
     // create geometry
