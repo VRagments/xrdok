@@ -1075,5 +1075,3 @@ const XRplanegraph = 'xr-plane-graph';
 
   });
 })();
-
->>>>>>> adding xr-plane-graph initial implementation and example
