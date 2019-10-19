@@ -21,6 +21,55 @@ const eventNames = [
 ];
 
 //
+// shaders
+//
+
+const yGradientVertexShader = `
+uniform vec3 bboxMin;
+uniform vec3 bboxMax;
+
+varying vec2 vUv;
+
+void main() {
+  vUv.y = (position.y - bboxMin.y) / (bboxMax.y - bboxMin.y);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+}
+`;
+
+const yGradientFragmentShader = `
+uniform vec3 color1;
+uniform vec3 color2;
+uniform vec3 color3;
+
+varying vec2 vUv;
+
+void main() {
+  
+  vec4 minColor = vec4(color1.x, color1.y, color1.z, 1.0);
+  vec4 medColor = vec4(color2.x, color2.y, color2.z, 1.0);
+  vec4 maxColor = vec4(color3.x, color3.y, color3.z, 1.0);
+
+  const float gradientSteps = 20.0;
+
+	vec4 color;
+
+	for (float i = 0.0; i < gradientSteps; i += 1.0) {
+		vec4 tmpColor;
+		if (i < gradientSteps / 2.0) {
+			tmpColor = mix(minColor, medColor, i * 2.0 / gradientSteps);
+		} else if (i > gradientSteps / 2.0) {
+			tmpColor = mix(medColor, maxColor, ((i + 1.0) - gradientSteps / 2.0) * 2.0 / gradientSteps);
+		} else {
+			tmpColor = medColor;
+		}
+		color = mix(color, tmpColor, step(i / gradientSteps, vUv.y));
+	}
+
+	gl_FragColor = color;
+}
+`;
+
+//
 // helpers
 //
 
@@ -727,4 +776,302 @@ const XRiconchevron = 'xr-icon-chevron';
     }
   });
 
+})();
+
+const XRplanegraph = 'xr-plane-graph';
+(function () {
+
+  function calculateXYearAvg(values, years) { // eslint-disable-line no-unused-vars
+    var entries = values.length;
+    var returnArray = [];
+    
+    if (entries >= years) {
+      for (var i = years; i < entries; i++) {
+        var rangeYears = values.slice(i-years,i);
+        const sum = rangeYears.reduce((a,b) => a += b);
+        const avg = sum/years;
+        returnArray.push(avg.toFixed(2));
+      }
+    }
+    return returnArray;
+  }
+
+  function createGradientShader(geo, data) {
+    geo.computeBoundingBox();
+    var shaderMat = new THREE.ShaderMaterial({
+      uniforms: {
+        color1: {
+          value: new THREE.Color(data.colorMin)
+        },
+        color2: {
+          value: new THREE.Color(data.colorNeutral)
+        },
+        color3: {
+          value: new THREE.Color(data.colorMax)
+        },
+        bboxMin: {
+          value: geo.boundingBox.min
+        },
+        bboxMax: {
+          value: geo.boundingBox.max
+        },
+        gradSteps: {
+          value: data.gradSteps // set to 0 to apply smoothstep
+        }
+      },
+      vertexShader: yGradientVertexShader,
+      fragmentShader: yGradientFragmentShader
+    });
+    return shaderMat;
+  }
+
+  function createVerticalLine(x, y, z, height, color) {
+    const line = document.createElement('a-entity');
+    line.setAttribute('line',
+      `start: ${x} ${y + height} ${-z};
+       end: ${x} ${y} ${-z};
+       color: ${color};
+      `
+    );
+    return line;
+  }
+
+  function createLabel(x, y, z, height, value, color) {
+    const label = document.createElement('a-text');
+    label.setAttribute('value', value);
+    label.setAttribute('color', color);
+    label.setAttribute('position', `${x} ${y + height} ${-z}`);
+    return label;
+  }
+
+  function createLegend(data) {
+    var offset = data.values[0];
+    var legendEl = document.createElement('a-entity');
+    legendEl.setAttribute('id', 'legend-parent');
+    const sec = data.graphWidth;
+    var gridEl = document.createElement('a-entity');
+    const count = data.values.length;
+    const maxVal = Math.max(...data.values);
+    const minVal = Math.min(...data.values);
+
+    // create geometry and elements
+    for (var j=0; j < Math.min(data.descriptors.length, data.values.length); j++) {
+      // attach label line
+      const prim = data.values[j]-offset;
+
+      // attach lines
+      legendEl.appendChild(createVerticalLine(sec*2, prim, j, 0.6, 'white'));
+      legendEl.appendChild(createVerticalLine(-sec*2, prim, j, 0.6, 'white'));
+      // attach labels
+      legendEl.appendChild(createLabel(sec*2, prim, j, 0.8, data.values[j], 'black'));
+      legendEl.appendChild(createLabel(-sec*2, prim, j, 0.8, data.descriptors[j], 'black'));
+    }
+
+    // create grid
+    for (var n = Math.floor(minVal); n <= Math.ceil(maxVal); n++) {
+      const line = document.createElement('a-entity');
+      line.setAttribute('line',
+        `start: ${sec*2} ${n-offset} 0; 
+         end: ${sec*2} ${n-offset} -${count};
+         color: white;
+        `
+      );
+      gridEl.appendChild(line);
+    }
+
+    // legendEl.appendChild(gridEl);
+    legendEl.setAttribute('visible', data.showLegend);
+
+    return legendEl;
+  }
+
+  function createGeometryLine(data) {
+    var offset = data.values[0];
+    var lineGraphEl = document.createElement('a-entity');
+    lineGraphEl.setAttribute('id', 'line-graph-parent');
+    var lineGraphGeo = new THREE.Geometry();
+    var lineGraphMat = new THREE.LineBasicMaterial({
+      color: data.color,
+      linewidth: 2,
+    });
+
+    // create geometry
+    for (var j=0; j < Math.min(data.descriptors.length, data.values.length); j++) {
+      //get const 
+      const prim = data.values[j]-offset;
+
+      // create vertices
+      lineGraphGeo.vertices.push(
+        new THREE.Vector3(data.graphWidth*2, prim, -j)
+      );
+    }
+    
+    // create mesh
+    var lineGraph = new THREE.Line(lineGraphGeo, lineGraphMat);
+    lineGraphEl.setObject3D('xr-line-graph', lineGraph);
+    lineGraphEl.setAttribute('visible', data.showLine);
+
+    return lineGraphEl;
+  }
+
+  function createGeometryPlane(data) {
+
+    var offset = data.values[0];
+    var dataLength = Math.min(data.descriptors.length, data.values.length);
+    var planeGraphEl = document.createElement('a-entity');
+    planeGraphEl.setAttribute('id', 'plane-graph-parent');
+    var planeGraphGeo = new THREE.Geometry();
+    
+    // create geometry
+    for (var j = 0; j < dataLength; j++) {
+      // get const
+      const prim = data.values[j]-offset;
+      const linePath = document.createElement('a-entity');
+
+      // create primary vertices
+      planeGraphGeo.vertices.push(
+        new THREE.Vector3(-data.graphWidth, prim, -j+0.3),
+        new THREE.Vector3(data.graphWidth, prim, -j+0.3),
+        new THREE.Vector3(-data.graphWidth, prim, -j-0.3),
+        new THREE.Vector3(data.graphWidth, prim, -j-0.3)
+      );
+
+      var step = j*4-2;
+
+      // create faces and material indices
+      if (j > 0) {
+        planeGraphGeo.faces.push(
+          new THREE.Face3(step, step+1, step+2),
+          new THREE.Face3(step+1, step+3, step+2),
+          new THREE.Face3(step+2, step+3, step+4),
+          new THREE.Face3(step+3, step+5, step+4)
+        );
+        planeGraphGeo.faces[step].materialIndex = step;
+        planeGraphGeo.faces[step+1].materialIndex = step;
+      } else {
+        planeGraphGeo.faces.push(
+          new THREE.Face3(0, 1, 2),
+          new THREE.Face3(1, 3, 2)
+        );
+      }
+
+      // attach outside line path 
+      planeGraphEl.appendChild(linePath);
+      linePath.setAttribute('line',
+        `start: ${-data.graphWidth*2} ${prim} ${-j};
+         end: ${data.graphWidth*2} ${prim} ${-j};
+         color: white;
+        `
+      );
+    }
+
+    planeGraphGeo.computeBoundingBox();
+
+    // create material
+    var planeGraphMat = createGradientShader(planeGraphGeo, data);
+    planeGraphMat.side = THREE.DoubleSide;
+
+    // create meshes
+    var planeGraphMesh = new THREE.Mesh(planeGraphGeo, planeGraphMat);
+    planeGraphEl.setObject3D('xr-plane-graph', planeGraphMesh);
+
+    planeGraphEl.setAttribute('visible', data.showGraph);
+    return planeGraphEl;
+  }
+
+  function createData(data, el) {
+    // parse CSV, if available
+    if (data.src) {
+      Papa.parse(data.src, {  // eslint-disable-line no-undef
+        download: true,
+        complete: function(res) {
+          data.descriptors = [];
+          data.values = [];
+          for (var i = 0; i < res.data.length; i++) {
+            data.descriptors.push(res.data[i][0]);
+            data.values.push(parseFloat(res.data[i][1]));
+          }
+
+          /*
+          var avg30 = calculateXYearAvg(data.values, 30);
+          data.values = avg30;
+          data.descriptors = data.descriptors.slice(30,data.descriptors.length);
+          */
+          
+          el.appendChild(createGeometryLine(data));
+          el.appendChild(createGeometryPlane(data));
+          el.appendChild(createLegend(data));
+        }
+      });
+    }
+  }
+
+  AFRAME.registerComponent(XRplanegraph, {
+
+    schema: {
+      color: { type: 'color', default: '#FFFFFF'},
+      colorMax: { type: 'color', default: '#67001F'},
+      colorMin: { type: 'color', default: '#053061'},
+      colorNeutral: { type: 'color', default: '#F7F7F7'},
+      descriptors: {type: 'array', default: [] },
+      graphWidth: {type: 'number', default: 2},
+      values: { type: 'array', default: [] },
+      valuesBase: { type: 'number', default: 0},
+      showGraph: { type: 'boolean', default: true},
+      showLegend: { type: 'boolean', default: true},
+      showLine: { type: 'boolean', default: true},
+      src: { type: 'string', default: './models/lufttemperatur_bbb_sortiert.csv'},
+    },
+
+    init: function() {
+      // data and element
+      var data = this.data;
+      var el = this.el;
+
+      createData(data, el);
+
+      this.lineEl = document.getElementById('line-graph-parent');
+      this.graphEl = document.getElementById('plane-graph-parent');
+      this.legendEl = document.getElementById('legend-parent');
+    },
+
+    tick: function() {
+      if (this.legendEl !== null && this.activeCamera) {
+        var legendEl = this.legendEl;
+        var activeCameraPosition = new THREE.Vector3();
+        this.activeCamera.object3D.getWorldPosition(activeCameraPosition);
+        for (let i =0; i < legendEl.children.length; i++){
+          if (legendEl.children[i].tagName.toLowerCase() === 'a-text') {
+            legendEl.children[i].object3D.lookAt(activeCameraPosition);
+          }
+        }
+      } else {
+        this.activeCamera = document.querySelector('[camera]');
+        this.legendEl = document.getElementById('legend-parent');
+      }
+    },
+
+    update: function(oldData) {
+      var data = this.data;
+
+      const lineEl = document.getElementById('line-graph-parent');
+      const graphEl = document.getElementById('plane-graph-parent');
+      const legendEl = document.getElementById('legend-parent');
+
+      if (data.showLine !== oldData.showLine && lineEl !== null) {
+        lineEl.setAttribute('visible', data.showLine);
+      }
+      if (data.showGraph !== oldData.showGraph && graphEl !== null) {
+        graphEl.setAttribute('visible', data.showGraph);
+      }
+      if (data.showLegend !== oldData.showLegend && legendEl !== null) {
+        legendEl.setAttribute('visible', data.showLegend);
+      }
+    },
+
+    remove: function() {
+      Object.values(this.children).forEach(v => this.el.removeChild(v));
+    },
+
+  });
 })();
